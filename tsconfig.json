@@ -6,6 +6,9 @@
     "sourceMap": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "types": [
+      "node"
+    ]
   },
   "files": [
     "src/models/backendInterfaces.d.ts",
