@@ -12,7 +12,6 @@
     "typeorm": "ts-node ./node_modules/typeorm/cli.js",
     "migrate": "npm run typeorm -- migration:run",
     "migrate:revert": "npm run typeorm -- migration:revert",
-    "start": "node dist/index.js",
     "build": "tsoa routes && tsoa swagger && tsc"
   },
   "license": "GNU",
