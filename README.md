@@ -46,6 +46,11 @@ To allow the dashboard app to access remote server API set `ALLOW_MANAGEMENT_ORI
 
 And set `ALLOW_DASHBOARD_ORIGIN` for the user's dashboard origin URL app (default is 'http://127.0.0.1:8081').
 
+In addition, if the frontend app running on a different domain then server, set `SAME_SITE_POLICY` to be false, otherways the browser restricts to send the session to the server. see cookies [SameSite](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie).
+
+Note the risk of allowing session cookie to send for other domains. 
+This is why the default value for `SAME_SITE_POLICY` is true.
+
 ### Addininal configuration available:
 See [server configure](../backend/README.md#configure-server).
 
