@@ -34,7 +34,7 @@ export class ForwardAuthController extends Controller {
             { expiresIn: jwtExpiresIn },
         );
         // tslint:disable-next-line:max-line-length
-        this.setHeader('Set-Cookie', `session=${token}; Max-Age=${httpResponse.httpSession.maxAge}; Path=/; HttpOnly; ${Configuration.http.useHttps || process.env.APP_BEHIND_PROXY_REDIRECT_HTTPS ? 'Secure' : ''}; SameSite=Strict`);
+        this.setHeader('Set-Cookie', `session=${token}; Max-Age=${httpResponse.httpSession.maxAge}; Path=/; HttpOnly; ${Configuration.http.useHttps || process.env.APP_BEHIND_PROXY_REDIRECT_HTTPS ? 'Secure' : ''}; SameSite=${process.env.SAME_SITE_POLICY !== 'false' ? 'Strict' : 'None' };`);
         // TODO change to 204, after frontend update
         this.setStatus(200);
     }
