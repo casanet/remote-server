@@ -155,6 +155,18 @@ class App {
                 }
             },
         }));
+
+        // Security 
+        this.express.get('/.well-known/security.txt', (req, res) => {
+            res.setHeader('Content-type', "application/octet-stream");
+            res.setHeader('Content-disposition', 'attachment; filename=security.txt');
+            res.send(`
+                This server build by an open-source project at https://github.com/casanet/remote-server .
+                If you would like to report a security issue in the code-base please open an issue in the repository,
+                or contact me directly via my profile https://github.com/haimkastner .
+                Thanks!
+            `)
+        });
     }
 
     /**
