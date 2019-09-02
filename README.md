@@ -37,7 +37,7 @@ The configuration is based on environment variable.
 
 All vaiables with example value placed in [.env.example](./.env.example) file.
 
-You can load the environment using .`env` file.
+You can load the environment using `.env` file.
 
 ### Secret keys
 
