@@ -62,7 +62,7 @@ This is why the default value for `SAME_SITE_POLICY` is true.
 ### Send mail account
 To send email (for MFA and notifications) the server needs to use a mail account access.
 
-See in the casanet server [Two factor authentication](https://github.com/casanet/casanet-server/tree/development/backend#two-factor-authentication-mfa) section, how to configure it.
+See in the casanet server [Two factor authentication](https://github.com/casanet/casanet-server/tree/master/backend#two-factor-authentication-mfa) section, how to configure it.
 
 ### Configure database
 
@@ -92,14 +92,13 @@ Define local variable named `DATABASE_URL` of the form `postgres://user:pass@loc
    ```
 
 ## Pair local server with remote server:
-1) In local server login as admin and get machine mac address (In side bar, `get physical address`). 
-1) In remote server login to management as admin and create a new local server (POST /servers).
-1) In remote server get local server id (GET /servers).
-1) In remote server generate key for local server (POST /servers/auth/{localServerId}).
-1) In local server set remote server settings with remote server URI (`ws://remote-server-domain/` or `wss://remote-server-domain/` case using HTTPS)
-and the generated key (PUT /remote).
-1) In local server route to users and start "register user to remote server" process.
-1) That's it, now you can access local server API via the remote server.
+1) In local dashboard login as admin and get machine mac address (In side bar, `get local MAC address`). 
+1) In remote dashboard login and create a new local server.
+1) In remote dashboard generate key for the local server.
+1) In local dashboard set remote server settings with remote server URI (`ws://remote-server-domain` or `wss://remote-server-domain` case using HTTPS)
+and the generated key.
+1) In remote dashboard add any needed email accounts to the valid users array or in the local server route to users and start "register user to remote server" process.
+1) That's it, now you can access local dashboard API via the remote server.
 
 ## Remote server API
 The [remote dashboard](https://github.com/casanet/remote-dashboard) wraping the administration API. 
