@@ -21,6 +21,7 @@ export const updateUserSchema: ObjectSchema = Joi.object().keys({
 export const serverSchema: ObjectSchema = Joi.object().keys({
     macAddress: Joi.string().not('').length(12).required(),
     displayName: Joi.string().allow('').max(30).required(),
+    contactMail: Joi.string().email().allow('').max(150),
     validUsers: Joi.array().items(Joi.string().email()).required(),
 }).required();
 

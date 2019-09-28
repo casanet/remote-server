@@ -21,11 +21,11 @@ const transporter = nodemailer.createTransport({
  */
 export const SendMail = async (to: string, code: string) => {
     const mailOptions: SendMailOptions = {
-        from: '"CASAnet" <' + Configuration.twoStepsVerification.userName + '>',
+        from: '"casanet" <' + Configuration.twoStepsVerification.userName + '>',
         to,
         replyTo: undefined,
         inReplyTo: undefined,
-        subject: 'CasaNet account verification',
+        subject: 'Casanet Account Verification',
         html: `
         <!DOCTYPE html>
         <body>
@@ -38,7 +38,7 @@ export const SendMail = async (to: string, code: string) => {
                                 <tbody>
                                     <tr>
                                         <td style="font-size:20px;font-weight:400;padding-top:120px;color:#303030;">
-                                            CasaNet Verification Code
+                                            Casanet Verification Code
                                         </td>
                                     </tr>
                                     <tr>
@@ -58,6 +58,78 @@ export const SendMail = async (to: string, code: string) => {
                                     <tr>
                                         <td style="font-size:13px;font-weight:200;color: #9b9b9b;padding-top:20px;">
                                             The generated code will expire within 5 minutes
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </body>`,
+    };
+
+    // send mail with defined transport object
+    return transporter.sendMail(mailOptions);
+};
+
+export const SendStatusNotificationMail = async (to: string, localServerName: string, status: boolean) => {
+    const alert = `
+    <td style="font-size:36px;font-weight:800;color: rgb(204, 51, 0);">
+        Notice! your local server  '${localServerName}' disconnected from the remote server.
+        <br>
+        <br>
+        <div style="text-align:left;font-size:20px;font-weight:600;color: rgb(6, 99, 75);">
+            If you don't know why try the following steps:
+            <ul>
+                <li>
+                    Check the local server computer health.
+                </li>
+                <li>
+                    Try enter to the local server dashboard via local network address.    
+                </li>
+                <li>
+                    In the dashboard check the remote server status & URL.
+                </li>
+                <li>
+                    Check your home internet connection.
+                </li>
+            </ul>
+        </div>
+    </td>`
+
+    const notification = `
+    <td style="font-size:36px;font-weight:800;color: rgb(6, 99, 75);">
+        Your local server  '${localServerName}' successfully connected to the remote server.
+    </td>`
+
+    const mailOptions: SendMailOptions = {
+        from: '"casanet remote" <' + Configuration.twoStepsVerification.userName + '>',
+        to,
+        replyTo: undefined,
+        inReplyTo: undefined,
+        subject: `Casanet Remote ${status ? 'Notification' : 'Alert'}`,
+        html: `
+        <!DOCTYPE html>
+        <body>
+            <table style="width:420px;text-align:center;margin:0 auto;padding:30px 0;line-height:1.5;">
+                <tbody>
+                    <tr>
+                        <td>
+                            <table style="width:100%;margin-top:46px;background:#fff;
+                                          box-shadow:0px 0px 15px rgb(138, 135, 135);text-align:center;">
+                                <tbody>
+                                    <tr>
+                                        <td style="font-size:20px;font-weight:400;padding-top:120px;color:#303030;">
+                                            Casanet Remote ${status ? 'Notification' : 'Alert'}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        ${status ? notification : alert}
+                                    </tr>
+                                    <tr>
+                                        <td style="font-size:13px;font-weight:200;color: #9b9b9b;padding-top:20px;">
+                                            This email sent to you from the casanet remote server because your email is a contact of a local server. if not please contact us by reply to this message.
                                         </td>
                                     </tr>
                                 </tbody>

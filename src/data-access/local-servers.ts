@@ -25,11 +25,12 @@ export const getServersByForwardUser = async (user: string): Promise<LocalServer
 };
 
 export const updateServer = async (server: LocalServer): Promise<void> => {
-  const { displayName, validUsers, macAddress } = server;
+  const { displayName, validUsers, macAddress, contactMail } = server;
   const serversRepository = getConnection().getRepository(LocalServer);
   await serversRepository.update(macAddress, {
     displayName,
     validUsers,
+    contactMail,
   });
 };
 
