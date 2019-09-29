@@ -74,9 +74,10 @@ export const SendMail = async (to: string, code: string) => {
 };
 
 export const SendStatusNotificationMail = async (to: string, localServerName: string, status: boolean) => {
+
     const timestump = `
     <div style="font-size:30px;font-weight:700;color: rgb(51, 0, 26);">
-        At ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
+        At ${new Date().toLocaleString(process.env.NOTIFICATIONS_TIME_FORMAT || 'he-IL', { timeZone  : process.env.NOTIFICATIONS_TIMEZON || 'Asia/Jerusalem' } )}
     </div>`;
 
     const alert = `
