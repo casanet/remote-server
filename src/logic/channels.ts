@@ -143,7 +143,7 @@ export class Channels {
             this.localServersStautsFeed.next({ localServerId: certAuth.macAddress, theNewStatus: true });
         } catch (error) {
 
-            logger.debug(`Fail to authenticate local server ${JSON.stringify(error)}`);
+            logger.debug(`Fail to authenticate local server '${certAuth.macAddress}' connection request`);
 
             /** send generic auth fail message */
             this.sendMessage(wsChannel, {
