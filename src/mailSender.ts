@@ -74,9 +74,17 @@ export const SendMail = async (to: string, code: string) => {
 };
 
 export const SendStatusNotificationMail = async (to: string, localServerName: string, status: boolean) => {
+    const timestump = `
+    <div style="font-size:30px;font-weight:700;color: rgb(51, 0, 26);">
+        At ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
+    </div>`;
+
     const alert = `
     <td style="font-size:36px;font-weight:800;color: rgb(204, 51, 0);">
         Notice! your local server  '${localServerName}' disconnected from the remote server.
+        <br>
+        <br>
+            ${timestump}
         <br>
         <br>
         <div style="text-align:left;font-size:20px;font-weight:600;color: rgb(6, 99, 75);">
@@ -101,6 +109,10 @@ export const SendStatusNotificationMail = async (to: string, localServerName: st
     const notification = `
     <td style="font-size:36px;font-weight:800;color: rgb(6, 99, 75);">
         Your local server  '${localServerName}' successfully connected to the remote server.
+
+        <br>
+        <br>
+        ${timestump}
     </td>`
 
     const mailOptions: SendMailOptions = {
