@@ -80,7 +80,7 @@ export const SendStatusNotificationMail = async (to: string, localServerName: st
         <br>
         <br>
         <div style="text-align:left;font-size:20px;font-weight:600;color: rgb(6, 99, 75);">
-            If you don't know why try the following steps:
+            If you don't know why, try the following steps:
             <ul>
                 <li>
                     Check the local server computer health.
