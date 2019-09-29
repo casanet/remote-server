@@ -179,6 +179,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "macAddress": { "dataType": "string", "required": true },
             "displayName": { "dataType": "string", "required": true },
+            "contactMail": { "dataType": "string" },
             "validUsers": { "dataType": "array", "array": { "dataType": "string" }, "required": true },
             "connectionStatus": { "dataType": "boolean", "required": true },
         },
@@ -187,6 +188,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "macAddress": { "dataType": "string", "required": true },
             "displayName": { "dataType": "string", "required": true },
+            "contactMail": { "dataType": "string" },
             "validUsers": { "dataType": "array", "array": { "dataType": "string" }, "required": true },
         },
     },

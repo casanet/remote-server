@@ -13,6 +13,10 @@ export class LocalServer {
     @Column({ name: 'display_name', type: 'varchar', length: 30, nullable: true })
     public displayName: string;
 
+    /** Contact mail, allow null case there is no contact defined */
+    @Column({ name: 'contact_mail', type: 'varchar', length: 150, nullable: true })
+    public contactMail?: string;
+
     /** Users from the local server that can access via remote server. */
     @Column({ name: 'valid_users', type: 'varchar', array: true, nullable: false })
     public validUsers: string[];

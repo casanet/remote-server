@@ -60,7 +60,7 @@ Note the risk of allowing session cookie to send for other domains.
 This is why the default value for `SAME_SITE_POLICY` is true.
 
 ### Send mail account
-To send email (for MFA and notifications) the server needs to use a mail account access.
+To send emails, (for MFA and status notifications) the server needs to use a mail account access.
 
 See in the casanet server [Two factor authentication](https://github.com/casanet/casanet-server/tree/master/backend#two-factor-authentication-mfa) section, how to configure it.
 

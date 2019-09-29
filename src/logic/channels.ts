@@ -68,6 +68,9 @@ export class Channels {
     /** Feed of local servers feeds. */
     public localServersFeed = new BehaviorSubject<{ localServerId: string, localServerFeed: LocalServerFeed }>(undefined);
 
+    /** Allow subscribe to local servers connection status, for notification, alerts logging etc.  */
+    public localServersStautsFeed = new BehaviorSubject<{ localServerId: string, theNewStatus: boolean }>(undefined);
+
     constructor() {
         /** Invoke requests timeout activation. */
         this.setTimeoutRequestsActivation();
@@ -135,9 +138,12 @@ export class Channels {
             this.sendMessage(wsChannel, { remoteMessagesType: 'authenticatedSuccessfuly', message: {} });
 
             logger.info(`Local server ${localServer.displayName} connected succefully`);
+
+            /** Update subscribers with the new local server status */
+            this.localServersStautsFeed.next({ localServerId: certAuth.macAddress, theNewStatus: true });
         } catch (error) {
 
-            logger.debug(`Fail to authenticate local server ${JSON.stringify(error)}`);
+            logger.debug(`Fail to authenticate local server '${certAuth.macAddress}' connection request`);
 
             /** send generic auth fail message */
             this.sendMessage(wsChannel, {
@@ -442,6 +448,9 @@ export class Channels {
 
         /** Remove it from channel map. */
         delete this.localChannelsMap[wsChannel.machineMac];
+
+        /** Update subscribers with the new local server status */
+        this.localServersStautsFeed.next({ localServerId: wsChannel.machineMac, theNewStatus: false });
     }
 
     /**
