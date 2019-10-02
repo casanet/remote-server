@@ -449,8 +449,10 @@ export class Channels {
         /** Remove it from channel map. */
         delete this.localChannelsMap[wsChannel.machineMac];
 
+        logger.info(`Local server ${wsChannel.machineMac} ws channel closed`)
+
         /** Update subscribers with the new local server status */
-        this.localServersStautsFeed.next({ localServerId: wsChannel.machineMac, theNewStatus: false });
+        this.localServersStautsFeed.next({ localServerId: wsChannel.machineMac, theNewStatus: false });    
     }
 
     /**
@@ -470,6 +472,8 @@ export class Channels {
 
         /** Remove it from channel map. */
         delete this.localChannelsMap[macAddress];
+
+        logger.info(`Local server ${localServerConnection.machineMac} disconnected by the remote server`)
     }
 
     /**

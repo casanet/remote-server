@@ -27,7 +27,7 @@ export class ChannelsController extends Controller {
 
         wsChannels.on('close', () => {
             ChannelsSingleton.onWsClose(wsChannels as CasaWs);
-            logger.debug(`web secket closed`);
+            logger.debug(`web socket closed`);
         });
 
         wsChannels.on('error', (err: Error) => {
