@@ -4,14 +4,20 @@ import { SendStatusNotificationMail } from '../mailSender';
 import { logger } from '../logger';
 import * as moment from 'moment';
 
+declare interface ServerNotifyTask {
+    status: boolean,
+    notificationTask: NodeJS.Timeout,
+    isPending: boolean
+}
+
 /**
- * Cache utility. wrap cache API to replace cache tool with redis client easily.
+ * Handle system notifications and alerts.
  */
-export class LocalServers {
+export class Notifications {
 
     private NOTIFICATION_TIME_WINDOW: moment.Duration = moment.duration(2, 'minutes');
 
-    private notificationTasks: { [key: string]: { status: boolean, notificationTask: NodeJS.Timeout, } } = {};
+    private notificationTasks: { [key: string]: ServerNotifyTask } = {};
 
     constructor(private ChannelsSingleton: Channels) {
         this.ChannelsSingleton.localServersStautsFeed.subscribe((serverStatus) => {
@@ -25,10 +31,23 @@ export class LocalServers {
 
     private async handleServerConnectionStatusChanged(serverStatus: { localServerId: string, theNewStatus: boolean }) {
 
-        const lastNotificationTask = this.notificationTasks[serverStatus.localServerId];
+        /** 
+         * Get the last server status and task, 
+         */
+        const lastNotificationTask: ServerNotifyTask = this.notificationTasks[serverStatus.localServerId];
+
+        /* if this is the first notification create a new task notification struct, and abort notificate */
+        if (!lastNotificationTask) {
+            this.notificationTasks[serverStatus.localServerId] = {
+                isPending: false,
+                notificationTask: null,
+                status: serverStatus.theNewStatus,
+            };
+            return;
+        }
 
         /** If status same as the last notification, ignore sending another notification */
-        if (lastNotificationTask && lastNotificationTask.status === serverStatus.theNewStatus) {
+        if (lastNotificationTask.status === serverStatus.theNewStatus) {
             return;
         }
 
@@ -44,8 +63,9 @@ export class LocalServers {
          * If the status changed back to original status in the notification time window, 
          * cancel the notification task.
          */
-        if (lastNotificationTask && lastNotificationTask.status !== serverStatus.theNewStatus) {
-            this.notificationTasks[serverStatus.localServerId] = null;
+        if (lastNotificationTask.isPending && lastNotificationTask.status !== serverStatus.theNewStatus) {
+            lastNotificationTask.isPending = false;
+            lastNotificationTask.status = serverStatus.theNewStatus;
             clearTimeout(lastNotificationTask.notificationTask);
             return;
         }
@@ -62,16 +82,15 @@ export class LocalServers {
             } catch (error) {
                 logger.error(`Sending mail notification failed, API problem, ${error.message}`);
             }
-            this.notificationTasks[serverStatus.localServerId] = null;
+            lastNotificationTask.isPending = false;
         }, this.NOTIFICATION_TIME_WINDOW.asMilliseconds());
 
-        this.notificationTasks[serverStatus.localServerId] = {
-            notificationTask :timeoutTaskRef,
-            status :  serverStatus.theNewStatus,
-        }
-
+        /** Update task props */
+        lastNotificationTask.isPending = true;
+        lastNotificationTask.status = serverStatus.theNewStatus;
+        lastNotificationTask.notificationTask = timeoutTaskRef;
     }
 
 }
 
-export const LocalServersSingleton = new LocalServers(ChannelsSingleton);
+export const NotificationsSingleton = new Notifications(ChannelsSingleton);
