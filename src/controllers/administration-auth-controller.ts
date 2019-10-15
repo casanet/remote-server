@@ -7,9 +7,9 @@ import { checkAdminAccess } from '../data-access';
 import { logger } from '../logger';
 import { SendMail } from '../mailSender';
 import { RemoteAdmin } from '../models';
-import { ErrorResponse, Login } from '../models/sharedInterfaces';
+import { ErrorResponse, Login, LoginMfa } from '../models/sharedInterfaces';
 import { jwtSecret } from '../security/authentication';
-import { LoginSchema, SchemaValidator } from '../security/schemaValidator';
+import { LoginSchema, LoginMfaSchema, SchemaValidator } from '../security/schemaValidator';
 
 const jwtExpiresIn = process.env.ADMIN_JWT_EXPIRES_IN || '2 days';
 
@@ -113,9 +113,9 @@ export class AdministrationAuthController extends Controller {
     @Response<ErrorResponse>(403, 'Auth fail')
     @Response<ErrorResponse>(422, 'Invalid schema')
     @Post('login/tfa')
-    public async administrationLoginTfa(@Body() login: Login): Promise<void> {
+    public async administrationLoginTfa(@Body() login: LoginMfa): Promise<void> {
         try {
-            login = await SchemaValidator(login, LoginSchema);
+            login = await SchemaValidator(login, LoginMfaSchema);
         } catch (err) {
             this.setStatus(422);
             return err.error.message;
@@ -128,9 +128,8 @@ export class AdministrationAuthController extends Controller {
          * If user request MFA in last 5 minutes, and MFA key same as generated, let user pass.
          */
         if (tfaData &&
-            tfaData.generatedKey === login.password &&
+            tfaData.generatedKey === login.mfaCode &&
             new Date().getTime() - tfaData.timeStamp.getTime() < momoent.duration(5, 'minutes').asMilliseconds()) {
-            delete tfaLogins[login.email];
             const admin = await checkAdminAccess(login);
 
             if (!admin) {
@@ -138,6 +137,7 @@ export class AdministrationAuthController extends Controller {
                 return;
             }
 
+            delete tfaLogins[login.email];
             return await this.activeSession(admin);
         }
 

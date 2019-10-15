@@ -9,7 +9,7 @@ import { ForwardSession, LocalServerInfo, LoginLocalServer } from '../models';
 import { HttpResponse } from '../models/remote2localProtocol';
 import { ErrorResponse, Login, User } from '../models/sharedInterfaces';
 import { forwardCache, jwtSecret } from '../security/authentication';
-import { LoginSchema, RequestSchemaValidator, SchemaValidator } from '../security/schemaValidator';
+import { LoginLocalServerSchema, RequestSchemaValidator, SchemaValidator } from '../security/schemaValidator';
 
 const jwtExpiresIn = process.env.FORWARD_JWT_EXPIRES_IN || '360 days';
 
@@ -52,7 +52,7 @@ export class ForwardAuthController extends Controller {
     public async login(@Request() request: express.Request, @Body() login: LoginLocalServer):
         Promise<void | LocalServerInfo[]> {
         try {
-            login = await SchemaValidator(login, LoginSchema);
+            login = await SchemaValidator(login, LoginLocalServerSchema);
         } catch (err) {
             this.setStatus(422);
             return err.error.message;
@@ -151,7 +151,7 @@ export class ForwardAuthController extends Controller {
         /** See comments in login function, its almost same. */
 
         try {
-            login = await SchemaValidator(login, LoginSchema);
+            login = await SchemaValidator(login, LoginLocalServerSchema);
         } catch (err) {
             this.setStatus(422);
             return err.error.message;
