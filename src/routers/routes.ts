@@ -198,6 +198,13 @@ const models: TsoaRoute.Models = {
             "password": { "dataType": "string", "required": true },
         },
     },
+    "LoginMfa": {
+        "properties": {
+            "email": { "dataType": "string", "required": true },
+            "password": { "dataType": "string", "required": true },
+            "mfaCode": { "dataType": "string", "required": true },
+        },
+    },
     "LocalServerInfo": {
         "properties": {
             "localServerId": { "dataType": "string", "required": true },
@@ -461,7 +468,7 @@ export function RegisterRoutes(app: express.Express) {
     app.post('/API/administration/auth/login/tfa',
         function(request: any, response: any, next: any) {
             const args = {
-                login: { "in": "body", "name": "login", "required": true, "ref": "Login" },
+                login: { "in": "body", "name": "login", "required": true, "ref": "LoginMfa" },
             };
 
             let validatedArgs: any[] = [];

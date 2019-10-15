@@ -564,6 +564,20 @@ definitions:
             - email
             - password
         type: object
+    LoginMfa:
+        description: 'Login with MFA schema model.'
+        properties:
+            email:
+                type: string
+            password:
+                type: string
+            mfaCode:
+                type: string
+        required:
+            - email
+            - password
+            - mfaCode
+        type: object
     LocalServerInfo:
         description: 'Info about a local server.'
         properties:
@@ -885,7 +899,7 @@ paths:
                     name: login
                     required: true
                     schema:
-                        $ref: '#/definitions/Login'
+                        $ref: '#/definitions/LoginMfa'
     /administration/auth/logout:
         post:
             operationId: AdministrationLogout

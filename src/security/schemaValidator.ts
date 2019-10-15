@@ -36,10 +36,21 @@ export const IftttOnChangedSchema: ObjectSchema = Joi.object().keys({
     newStatus: Joi.string().allow('on', 'off').required(),
 }).required();
 
-export const LoginSchema: ObjectSchema = Joi.object().keys({
+export const LoginLocalServerSchema: ObjectSchema = Joi.object().keys({
     email: Joi.string().email().required(),
     password: Joi.string().not('').required(),
     localServerId: Joi.string().allow(''),
+}).required();
+
+export const LoginSchema: ObjectSchema = Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string().not('').required(),
+}).required();
+
+export const LoginMfaSchema: ObjectSchema = Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string().not('').required(),
+    mfaCode: Joi.string().length(6).required(),
 }).required();
 
 const forwardAccountSchema: ObjectSchema = Joi.object().keys({

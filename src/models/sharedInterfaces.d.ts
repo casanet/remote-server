@@ -59,6 +59,15 @@ export declare interface Login {
     password: string;
 }
 
+/**
+ * Login with MFA schema model.
+ */
+export declare interface LoginMfa {
+    email: string;
+    password: string;
+    mfaCode: string;
+}
+
 
 /**
  * Represents any physical device in a local network.
