@@ -7,6 +7,10 @@ import { AuthScopes, ForwardSession } from '../models';
 import { ErrorResponse, IftttActionTriggeredRequest } from '../models/sharedInterfaces';
 import { IftttAuthRequestSchema, SchemaValidator } from './schemaValidator';
 
+export declare interface SessionPayload {
+    scope: string;
+}
+
 export const jwtSecret = process.env.JWT_SECRET;
 if (!jwtSecret) {
     logger.fatal('You must set the jwt secret!');
@@ -56,23 +60,22 @@ export const expressAuthentication = async (request: express.Request, scopes: st
         return;
     }
 
-    /** If the session cookie empty, ther is nothing to check. */
+    /** 
+     * If the session cookie empty, 
+     * there is nothing to check. 
+     */
     if (!request.cookies.session) {
         throw {
             responseCode: 1403,
         } as ErrorResponse;
     }
 
-    /** Handle admin JWT tokens */
-    if (scopes.indexOf(SystemAuthScopes.adminScope) !== -1) {
-        const payload = jwt.verify(request.cookies.session, jwtSecret) as object;
-        return payload['email'];
-    }
+    /** Check the session */
+    const payload = jwt.verify(request.cookies.session, jwtSecret) as SessionPayload;
 
-    /** Handle forward JWT tokens */
-    if (scopes.indexOf(SystemAuthScopes.forwardScope) !== -1) {
-        const payload = jwt.verify(request.cookies.session, jwtSecret) as ForwardSession;
-        return payload;
+    /** Check the session scope */
+    if (scopes.indexOf(payload.scope) !== -1) {
+        return payload.scope === SystemAuthScopes.adminScope ? payload['email'] : payload;
     }
 
     throw {
