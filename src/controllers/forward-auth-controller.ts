@@ -8,7 +8,7 @@ import { ChannelsSingleton } from '../logic';
 import { ForwardSession, LocalServerInfo, LoginLocalServer } from '../models';
 import { HttpResponse } from '../models/remote2localProtocol';
 import { ErrorResponse, Login, User } from '../models/sharedInterfaces';
-import { forwardCache, jwtSecret } from '../security/authentication';
+import { forwardCache, jwtSecret, SystemAuthScopes, SessionPayload } from '../security/authentication';
 import { LoginLocalServerSchema, RequestSchemaValidator, SchemaValidator } from '../security/schemaValidator';
 
 const jwtExpiresIn = process.env.FORWARD_JWT_EXPIRES_IN || '360 days';
@@ -28,13 +28,17 @@ export class ForwardAuthController extends Controller {
             server: localServerMacAddress,
         };
 
+        /** Convert the type to the 'SessionPayload' type (keep the original obj data) */
+        const sessionPayload = forwardSession as unknown as SessionPayload;
+        sessionPayload.scope = SystemAuthScopes.forwardScope;
         const token = jwt.sign(
-            forwardSession,
+            sessionPayload,
             jwtSecret,
             { expiresIn: jwtExpiresIn },
         );
+
         // tslint:disable-next-line:max-line-length
-        this.setHeader('Set-Cookie', `session=${token}; Max-Age=${httpResponse.httpSession.maxAge}; Path=/; HttpOnly; ${Configuration.http.useHttps || process.env.APP_BEHIND_PROXY_REDIRECT_HTTPS ? 'Secure' : ''}; SameSite=${process.env.SAME_SITE_POLICY !== 'false' ? 'Strict' : 'None' };`);
+        this.setHeader('Set-Cookie', `session=${token}; Max-Age=${httpResponse.httpSession.maxAge}; Path=/; HttpOnly; ${Configuration.http.useHttps || process.env.APP_BEHIND_PROXY_REDIRECT_HTTPS ? 'Secure' : ''}; SameSite=${process.env.SAME_SITE_POLICY !== 'false' ? 'Strict' : 'None'};`);
         // TODO change to 204, after frontend update
         this.setStatus(200);
     }

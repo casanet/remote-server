@@ -8,7 +8,7 @@ import { logger } from '../logger';
 import { SendMail } from '../mailSender';
 import { RemoteAdmin } from '../models';
 import { ErrorResponse, Login, LoginMfa } from '../models/sharedInterfaces';
-import { jwtSecret } from '../security/authentication';
+import { jwtSecret, SystemAuthScopes } from '../security/authentication';
 import { LoginSchema, LoginMfaSchema, SchemaValidator } from '../security/schemaValidator';
 
 const jwtExpiresIn = process.env.ADMIN_JWT_EXPIRES_IN || '2 days';
@@ -32,6 +32,7 @@ export class AdministrationAuthController extends Controller {
         const token = jwt.sign(
             {
                 email: admin.email,
+                scope: SystemAuthScopes.adminScope,
             },
             jwtSecret,
             {
@@ -42,7 +43,7 @@ export class AdministrationAuthController extends Controller {
          * Finally load session on cookies response.
          */
         // tslint:disable-next-line:max-line-length
-        this.setHeader('Set-Cookie', `session=${token}; Max-Age=${2.592e+6}; Path=/; HttpOnly; ${Configuration.http.useHttps || process.env.APP_BEHIND_PROXY_REDIRECT_HTTPS ? 'Secure' : ''}; SameSite=${process.env.SAME_SITE_POLICY !== 'false' ? 'Strict' : 'None' };`);
+        this.setHeader('Set-Cookie', `session=${token}; Max-Age=${2.592e+6}; Path=/; HttpOnly; ${Configuration.http.useHttps || process.env.APP_BEHIND_PROXY_REDIRECT_HTTPS ? 'Secure' : ''}; SameSite=${process.env.SAME_SITE_POLICY !== 'false' ? 'Strict' : 'None'};`);
     }
 
     /**
