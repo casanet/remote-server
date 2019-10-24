@@ -43,7 +43,7 @@ export class AdministrationAuthController extends Controller {
          * Finally load session on cookies response.
          */
         // tslint:disable-next-line:max-line-length
-        this.setHeader('Set-Cookie', `session=${token}; Max-Age=${2.592e+6}; Path=/; HttpOnly; ${Configuration.http.useHttps || process.env.APP_BEHIND_PROXY_REDIRECT_HTTPS ? 'Secure' : ''}; SameSite=${process.env.SAME_SITE_POLICY !== 'false' ? 'Strict' : 'None'};`);
+        this.setHeader('Set-Cookie', `admin_session=${token}; Max-Age=${2.592e+6}; Path=/; HttpOnly; ${Configuration.http.useHttps || process.env.APP_BEHIND_PROXY_REDIRECT_HTTPS ? 'Secure' : ''}; SameSite=${process.env.SAME_SITE_POLICY !== 'false' ? 'Strict' : 'None'};`);
     }
 
     /**
@@ -156,7 +156,7 @@ export class AdministrationAuthController extends Controller {
         /** Currently there is no blacklist of invalid tokens */
 
         /** Send clean session by response to client browser. */
-        this.setHeader('Set-Cookie', `session=0;  Path=/;`);
+        this.setHeader('Set-Cookie', `admin_session=0;  Path=/;`);
 
     }
 }
