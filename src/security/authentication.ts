@@ -60,18 +60,22 @@ export const expressAuthentication = async (request: express.Request, scopes: st
         return;
     }
 
+    const jwtSession =
+        scopes.indexOf(SystemAuthScopes.adminScope) !== -1
+            ? request.cookies.admin_session
+            : request.cookies.session;
     /** 
      * If the session cookie empty, 
      * there is nothing to check. 
      */
-    if (!request.cookies.session) {
+    if (!jwtSession) {
         throw {
             responseCode: 1403,
         } as ErrorResponse;
     }
 
     /** Check the session */
-    const payload = jwt.verify(request.cookies.session, jwtSecret) as SessionPayload;
+    const payload = jwt.verify(jwtSession, jwtSecret) as SessionPayload;
 
     /** Check the session scope */
     if (scopes.indexOf(payload.scope) !== -1) {
