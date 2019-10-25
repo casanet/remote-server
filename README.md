@@ -42,7 +42,7 @@ You can load the environment using `.env` file.
 ### Secret keys
 
 Define variable named `JWT_SECRET` with secret string to sign sessions.
-You can defain `ADMIN_JWT_EXPIRES_IN` (the default is '2 days') and `FORWARD_JWT_EXPIRES_IN` (the default is '360 days'). 
+You can defain `ADMIN_JWT_EXPIRES_IN` in the [ms](https://www.npmjs.com/package/ms) format (the default is '2 days'). 
 
 ### App behind proxy
 When deploying an app to some services (Heroku, AWS, etc) the app runs behind a proxy.

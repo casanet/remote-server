@@ -10,6 +10,7 @@ import { RemoteAdmin } from '../models';
 import { ErrorResponse, Login, LoginMfa } from '../models/sharedInterfaces';
 import { jwtSecret, SystemAuthScopes } from '../security/authentication';
 import { LoginSchema, LoginMfaSchema, SchemaValidator } from '../security/schemaValidator';
+import ms = require('ms');
 
 const jwtExpiresIn = process.env.ADMIN_JWT_EXPIRES_IN || '2 days';
 
@@ -42,8 +43,11 @@ export class AdministrationAuthController extends Controller {
         /**
          * Finally load session on cookies response.
          */
+        const maxAgeInSec = ms(jwtExpiresIn) / 1000;
+        const isHttpsOnly = Configuration.http.useHttps || process.env.APP_BEHIND_PROXY_REDIRECT_HTTPS;
+        const forceSameDomain = process.env.SAME_SITE_POLICY !== 'false';
         // tslint:disable-next-line:max-line-length
-        this.setHeader('Set-Cookie', `admin_session=${token}; Max-Age=${2.592e+6}; Path=/; HttpOnly; ${Configuration.http.useHttps || process.env.APP_BEHIND_PROXY_REDIRECT_HTTPS ? 'Secure' : ''}; SameSite=${process.env.SAME_SITE_POLICY !== 'false' ? 'Strict' : 'None'};`);
+        this.setHeader('Set-Cookie', `admin_session=${token}; Max-Age=${maxAgeInSec}; Path=/; HttpOnly; ${isHttpsOnly ? 'Secure' : ''}; SameSite=${forceSameDomain ? 'Strict' : 'None'};`);
     }
 
     /**
