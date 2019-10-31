@@ -2,7 +2,7 @@
 
 ## For what?
 The [casanet server](https://github.com/casanet/casanet-server) is running on the local network. 
-so to access casa-net API outside the home we need to know our home public IP address and configure port forwarding in-home router.
+so to get access to the local casanet API outside the home we need to know our home public IP address and configure port forwarding in-home router.
 
 But it not so easy, because some of ISP services giving NAT IP and not public IP, and some other replacing IP addresses each connection,
 also for port forwarding, the computer needs to use a static IP address in a local network.
@@ -15,7 +15,7 @@ The WS connection used only to redirect requests,
 and in the local server, it will be converted back to an HTTP request and authentication and handled like each other HTTP request.
 
 One remote server can manage and redirect API calls to many local servers,
-the redirection to correct local server is based on valid users list of each local server, all email accounts in that list verified by the remote server with registration code, before adding them to the collection or added manually by the remote server administrator.
+the redirection to the correct local server is based on valid users list of each local server, all email accounts in that list verified by the remote server with registration code, before adding them to the collection or added manually by the remote server administrator.
 
 If the user email exists in more then one local server valid users you will need in login request to select a local server to try redirect to.
 
@@ -35,14 +35,14 @@ Simple diagram:
 
 The configuration is based on the environment variables.
 
-All vaiables with example value placed in [.env.example](./.env.example) file.
+All variables with example value placed in [.env.example](./.env.example) file.
 
 You can load the environment using `.env` file.
 
 ### Secret keys
 
-Define a variable named `JWT_SECRET` with secret string to sign sessions.
-You can defain `ADMIN_JWT_EXPIRES_IN` in the [ms](https://www.npmjs.com/package/ms) format (the default is '2 days'). 
+Define a variable named `JWT_SECRET` with a secret string to sign sessions.
+You can define `ADMIN_JWT_EXPIRES_IN` in the [ms](https://www.npmjs.com/package/ms) format (the default is '2 days'). 
 
 ### App behind a proxy
 When deploying an app to some services (Heroku, AWS, etc) the app runs behind a proxy.
