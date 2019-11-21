@@ -7,7 +7,7 @@
     "url": "https://github.com/casanet/remote-server"
   },
   "description": "https://github.com/casanet/remote-server",
-  "main": "dist/remote/src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "typeorm": "ts-node ./node_modules/typeorm/cli.js",
     "migrate": "npm run typeorm -- migration:run",
