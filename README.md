@@ -29,7 +29,8 @@ Simple diagram:
 1. Download the project via git or download files as a zip.
 1. Install Node.js on the machine.
 1. Navigate in a command line to `$/remote-server` and press `npm ci`.
-1. Press `node dist/index.js` to run the server.
+1. Build the source code by `npm run build`.
+1. Press `npm run start` to run the server.
 
 ### Configuration
 
