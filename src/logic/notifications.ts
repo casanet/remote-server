@@ -78,7 +78,7 @@ export class Notifications {
             /** Send notification to the contact about the new status */
             try {
                 await SendStatusNotificationMail(server.contactMail, server.displayName, serverStatus.theNewStatus)
-                logger.info(`Email status '${serverStatus.theNewStatus}' notification of ${server.displayName} successfully sent`);
+                logger.info(`A notification mail with meesage about the new status ('${serverStatus.theNewStatus}') of ${server.displayName} local server successfully sent`);
             } catch (error) {
                 logger.error(`Sending mail notification failed, API problem, ${error.message}`);
             }
