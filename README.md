@@ -58,9 +58,7 @@ And to redirect HTTP request to HTTPS set `APP_BEHIND_PROXY_REDIRECT_HTTPS` env 
 
 ### Allow cors for the frontend apps
 
-To allow the management dashboard app to access remote server API set `ALLOW_MANAGEMENT_ORIGIN` with the origin URL of the management app (default is 'http://127.0.0.1:8080').
-
-And set `ALLOW_DASHBOARD_ORIGIN` for the user's dashboard origin URL app (default is 'http://127.0.0.1:8081').
+To allow the casanet and remote management web interfaces to access the remote server API set `ALLOW_MANAGEMENT_ORIGINS` with the origin URL's (separated by `,`) of the web app (default is 'http://127.0.0.1:8080' and 'http://127.0.0.1:8081').
 
 In addition, if the frontend app running on a different domain then the server, set `SAME_SITE_POLICY` to be false, otherways the browser restricts to send the session to the server. see cookies [SameSite](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie).
 
