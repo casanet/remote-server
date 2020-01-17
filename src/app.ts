@@ -135,11 +135,14 @@ class App {
     this.express.use(helmet.frameguard({ action: 'deny' }));
 
     // Open CORS to let frontend apps API access.
-    const whitelist = [
-      process.env.ALLOW_MANAGEMENT_ORIGIN || 'http://127.0.0.1:8080',
-      process.env.ALLOW_DASHBOARD_ORIGIN || 'http://127.0.0.1:8081',
-    ];
-    logger.info('Openning CORS for the following origins:');
+    const { ALLOW_DASHBOARD_ORIGINS } = process.env;
+
+    // Get the domains (separated by ',') or use the default domains
+    const whitelist = ALLOW_DASHBOARD_ORIGINS
+      ? ALLOW_DASHBOARD_ORIGINS.split(',')
+      : ['http://127.0.0.1:8080', 'http://127.0.0.1:8081'];
+
+    logger.info('Opening CORS for the following origins:');
     // tslint:disable-next-line: no-console
     console.table(whitelist);
     this.express.use(
