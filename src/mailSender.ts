@@ -5,13 +5,13 @@ import { Configuration } from './config';
 
 // create reusable transporter object using the default SMTP transport
 const transporter = nodemailer.createTransport({
-    host: Configuration.twoStepsVerification.smtpServer,
-    port: 465,
-    secure: true, // true for 465, false for other ports
-    auth: {
-        user: Configuration.twoStepsVerification.userName,
-        pass: Configuration.twoStepsVerification.userKey,
-    },
+  host: Configuration.twoStepsVerification.smtpServer,
+  port: 465,
+  secure: true, // true for 465, false for other ports
+  auth: {
+    user: Configuration.twoStepsVerification.userName,
+    pass: Configuration.twoStepsVerification.userKey,
+  },
 });
 
 /**
@@ -20,13 +20,13 @@ const transporter = nodemailer.createTransport({
  * @param code generate code to send.
  */
 export const SendMail = async (to: string, code: string) => {
-    const mailOptions: SendMailOptions = {
-        from: '"casanet" <' + Configuration.twoStepsVerification.userName + '>',
-        to,
-        replyTo: undefined,
-        inReplyTo: undefined,
-        subject: 'Casanet Account Verification',
-        html: `
+  const mailOptions: SendMailOptions = {
+    from: '"casanet" <' + Configuration.twoStepsVerification.userName + '>',
+    to,
+    replyTo: undefined,
+    inReplyTo: undefined,
+    subject: 'Casanet Account Verification',
+    html: `
         <!DOCTYPE html>
         <body>
             <table style="width:420px;text-align:center;margin:0 auto;padding:30px 0;line-height:1.5;">
@@ -67,20 +67,21 @@ export const SendMail = async (to: string, code: string) => {
                 </tbody>
             </table>
         </body>`,
-    };
+  };
 
-    // send mail with defined transport object
-    return transporter.sendMail(mailOptions);
+  // send mail with defined transport object
+  return transporter.sendMail(mailOptions);
 };
 
 export const SendStatusNotificationMail = async (to: string, localServerName: string, status: boolean) => {
-
-    const timestump = `
+  const timestump = `
     <div style="font-size:30px;font-weight:700;color: rgb(51, 0, 26);">
-        At ${new Date().toLocaleString(process.env.NOTIFICATIONS_TIME_FORMAT || 'he-IL', { timeZone  : process.env.NOTIFICATIONS_TIMEZON || 'Asia/Jerusalem' } )}
+        At ${new Date().toLocaleString(process.env.NOTIFICATIONS_TIME_FORMAT || 'he-IL', {
+          timeZone: process.env.NOTIFICATIONS_TIMEZON || 'Asia/Jerusalem',
+        })}
     </div>`;
 
-    const alert = `
+  const alert = `
     <td style="font-size:36px;font-weight:800;color: rgb(204, 51, 0);">
         Notice! your local server  '${localServerName}' disconnected from the remote server.
         <br>
@@ -105,24 +106,24 @@ export const SendStatusNotificationMail = async (to: string, localServerName: st
                 </li>
             </ul>
         </div>
-    </td>`
+    </td>`;
 
-    const notification = `
+  const notification = `
     <td style="font-size:36px;font-weight:800;color: rgb(6, 99, 75);">
         Your local server  '${localServerName}' successfully connected to the remote server.
 
         <br>
         <br>
         ${timestump}
-    </td>`
+    </td>`;
 
-    const mailOptions: SendMailOptions = {
-        from: '"casanet remote" <' + Configuration.twoStepsVerification.userName + '>',
-        to,
-        replyTo: undefined,
-        inReplyTo: undefined,
-        subject: `Casanet Remote ${status ? 'Notification' : 'Alert'}`,
-        html: `
+  const mailOptions: SendMailOptions = {
+    from: '"casanet remote" <' + Configuration.twoStepsVerification.userName + '>',
+    to,
+    replyTo: undefined,
+    inReplyTo: undefined,
+    subject: `Casanet Remote ${status ? 'Notification' : 'Alert'}`,
+    html: `
         <!DOCTYPE html>
         <body>
             <table style="width:420px;text-align:center;margin:0 auto;padding:30px 0;line-height:1.5;">
@@ -152,8 +153,8 @@ export const SendStatusNotificationMail = async (to: string, localServerName: st
                 </tbody>
             </table>
         </body>`,
-    };
+  };
 
-    // send mail with defined transport object
-    return transporter.sendMail(mailOptions);
+  // send mail with defined transport object
+  return transporter.sendMail(mailOptions);
 };

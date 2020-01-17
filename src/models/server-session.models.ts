@@ -5,11 +5,11 @@ import { LocalServer } from '.';
  */
 @Entity({ name: 'servers_sessions' })
 export class ServerSession {
-    @PrimaryColumn()
-    @OneToOne((type) => LocalServer)
-    @JoinColumn({ name: 'server'})
-    public server: LocalServer;
+  @PrimaryColumn()
+  @OneToOne(type => LocalServer)
+  @JoinColumn({ name: 'server' })
+  public server: LocalServer;
 
-    @Column({ name: 'hashed_key', type: 'varchar', length: 256, nullable: false })
-    public hashedKey: string;
+  @Column({ name: 'hashed_key', type: 'varchar', length: 256, nullable: false })
+  public hashedKey: string;
 }
