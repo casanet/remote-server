@@ -4,7 +4,7 @@ import * as NodeCache from 'node-cache';
  * Cache utility. wrap cache API to replace cache tool with redis client easily.
  */
 export class Cache {
-  private _nodeCache: NodeCache;
+  private nodeCache: NodeCache;
 
   /**
    * Init Cache.
@@ -12,7 +12,7 @@ export class Cache {
    * @param checkperiod Automatic delete check interval duration in seconds.
    */
   constructor(ttl: number, checkperiod: number = 0) {
-    this._nodeCache = new NodeCache({
+    this.nodeCache = new NodeCache({
       stdTTL: ttl,
       checkperiod,
     });
@@ -24,7 +24,7 @@ export class Cache {
    * @returns The value, or 'undefined' if not exist.
    */
   public async get(key: string | number): Promise<any> {
-    return this._nodeCache.get(key);
+    return this.nodeCache.get(key);
   }
 
   /**
@@ -33,6 +33,6 @@ export class Cache {
    * @param value The value to store.
    */
   public async set(key: string | number, value: any): Promise<void> {
-    this._nodeCache.set(key, value);
+    this.nodeCache.set(key, value);
   }
 }

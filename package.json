@@ -9,11 +9,15 @@
   "description": "https://github.com/casanet/remote-server",
   "main": "dist/index.js",
   "scripts": {
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json",
+    "lint:fix": "tslint --fix -p tsconfig.json",
     "typeorm": "ts-node ./node_modules/typeorm/cli.js",
     "migrate": "npm run typeorm -- migration:run",
     "migrate:revert": "npm run typeorm -- migration:revert",
     "start": "node ./dist/index.js",
-    "build": "tsoa routes && tsoa swagger && tsc"
+    "build": "npm run format && npm run lint && tsoa routes && tsoa swagger && tsc",
+    "build:dev": "tsoa routes && tsoa swagger && tsc"
   },
   "license": "GNU",
   "dependencies": {
@@ -46,7 +50,7 @@
     "randomstring": "^1.1.5",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.5.2",
-    "tsoa": "^2.4.3",
+    "tsoa": "2.4.3",
     "typeorm": "^0.2.18",
     "ws": "^6.2.1"
   },
@@ -69,7 +73,10 @@
     "copyfiles": "^2.1.1",
     "cross-env": "^5.2.0",
     "del-cli": "^1.1.0",
+    "prettier": "^1.19.1",
     "ts-node": "^7.0.1",
+    "tslint": "^5.20.1",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.5.3"
   }
 }

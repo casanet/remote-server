@@ -1,6 +1,5 @@
-import { MigrationInterface, QueryRunner, TableColumn  } from 'typeorm';
+import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
-                         
 export class AddContact1569689998510 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     await this._createColumns(queryRunner);
@@ -18,7 +17,7 @@ export class AddContact1569689998510 implements MigrationInterface {
         type: 'varchar',
         isNullable: true,
         length: '150',
-      })
+      }),
     );
   }
 }
