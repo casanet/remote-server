@@ -49,7 +49,7 @@ definitions:
             - model
         type: object
     Toggle:
-        description: "A toggle value, the toggle is on way communicated device,\r\nFor example wall light switches with 433 RF that can turn on or off \r\nbut there is no way to know the real light status if someone changes the light status using physical switche."
+        description: "A toggle value, the toggle is on way communicated device,\r\nFor example wall light switches with 433 RF that can turn on or off\r\nbut there is no way to know the real light status if someone changes the light status using physical switche."
         properties:
             status:
                 type: string
@@ -267,7 +267,7 @@ definitions:
                 x-nullable: true
         type: object
     Minion:
-        description: "Represents a minion in system.\r\nMinion is a logic device in the system, meaning that a device is a physical device and minion is a logic device \r\nthat uses a physical device to switch home kit status. For example, an IR transmitter can be one physical device \r\nfor a few minions, one to central AC control and second for secondary AC control \r\nso in it will be two totally different minions that use one physical device."
+        description: "Represents a minion in system.\r\nMinion is a logic device in the system, meaning that a device is a physical device and minion is a logic device\r\nthat uses a physical device to switch home kit status. For example, an IR transmitter can be one physical device\r\nfor a few minions, one to central AC control and second for secondary AC control\r\nso in it will be two totally different minions that use one physical device."
         properties:
             minionId:
                 type: string
@@ -301,7 +301,7 @@ definitions:
             minionAutoTurnOffMS:
                 type: number
                 format: double
-                description: "Auto turns  off duration, *if* set member value then the minion will turn off in X ms after turning it on, \r\nUsed for example in boiler minion etc."
+                description: "Auto turns  off duration, *if* set member value then the minion will turn off in X ms after turning it on,\r\nUsed for example in boiler minion etc."
                 x-nullable: true
         required:
             - name
@@ -357,7 +357,7 @@ definitions:
             durationMinutes:
                 type: number
                 format: double
-                description: "Minutes from the sun trigger.\r\ncan be before or after the sun triggers.\r\nFor example, to invoke 40 minutes before sunset set -40 and to invoke 40 minutes after sunset set 40.\r\n\r\nNOTE! if the duration is more then minutes available in the day from the sun trigger time, the timing will not activate. \r\nfor example if the sunset is in 18:00 and the duration set to 7*60 minutes, \r\nthe activate time is not on the same day, so it will not activate at all."
+                description: "Minutes from the sun trigger.\r\ncan be before or after the sun triggers.\r\nFor example, to invoke 40 minutes before sunset set -40 and to invoke 40 minutes after sunset set 40.\r\n\r\nNOTE! if the duration is more then minutes available in the day from the sun trigger time, the timing will not activate.\r\nfor example if the sunset is in 18:00 and the duration set to 7*60 minutes,\r\nthe activate time is not on the same day, so it will not activate at all."
             sunTrigger:
                 type: string
                 enum:

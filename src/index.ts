@@ -1,3 +1,24 @@
+const welcomeMessage = `
+    .::         .:         .:: ::        .:       .:::     .::.::::::::.::: .::::::
+ .::   .::     .: ::     .::    .::     .: ::     .: .::   .::.::           .::    
+.::           .:  .::     .::          .:  .::    .:: .::  .::.::           .::    
+.::          .::   .::      .::       .::   .::   .::  .:: .::.::::::       .::    
+.::         .:::::: .::        .::   .:::::: .::  .::   .: .::.::           .::    
+ .::   .:: .::       .:: .::    .:: .::       .:: .::    .: ::.::           .::    
+   .::::  .::         .::  .:: ::  .::         .::.::      .::.::::::::     .::    
+
+
+'||''|.                                .            .|'''.|                                           
+ ||   ||    ....  .. .. ..     ...   .||.    ....   ||..  '    ....  ... ..  .... ...   ....  ... ..  
+ ||''|'   .|...||  || || ||  .|  '|.  ||   .|...||   ''|||.  .|...||  ||' ''  '|.  |  .|...||  ||' '' 
+ ||   |.  ||       || || ||  ||   ||  ||   ||      .     '|| ||       ||       '|.|   ||       ||     
+.||.  '|'  '|...' .|| || ||.  '|..|'  '|.'  '|...' |'....|'   '|...' .||.       '|     '|...' .||.    
+                                                                                                        
+`;
+
+// tslint:disable-next-line: no-console
+console.log('\x1b[34m', welcomeMessage, '\x1b[0m');
+
 import * as fs from 'fs';
 import * as http from 'http';
 import * as https from 'https';
@@ -14,45 +35,44 @@ logger.info('casa-net remote server app starting...');
 
 // Start HTTP application
 let server: any = http.createServer(app).listen(process.env.PORT || Configuration.http.httpPort, () => {
-    logger.info('HTTP listen on port ' + Configuration.http.httpPort);
+  logger.info('HTTP listen on port ' + Configuration.http.httpPort);
 });
 
 // SSL/HTTPS
 if (Configuration.http.useHttps) {
-    try {
-        const key = fs.readFileSync(path.join(__dirname, '/../encryption/private.key'));
-        const cert = fs.readFileSync(path.join(__dirname, '/../encryption/certificate.crt'));
-        const ca = fs.readFileSync(path.join(__dirname, '/../encryption/ca_bundle.crt'));
+  try {
+    const key = fs.readFileSync(path.join(__dirname, '/../encryption/private.key'));
+    const cert = fs.readFileSync(path.join(__dirname, '/../encryption/certificate.crt'));
+    const ca = fs.readFileSync(path.join(__dirname, '/../encryption/ca_bundle.crt'));
 
-        const sslOptions: https.ServerOptions = {
-            key,
-            cert,
-            ca,
-        };
+    const sslOptions: https.ServerOptions = {
+      key,
+      cert,
+      ca,
+    };
 
-        /** Prefer https. */
-        server = https.createServer(sslOptions, app).listen(Configuration.http.httpsPort, () => {
-            logger.info('HTTPS/SSL listen on port ' + Configuration.http.httpsPort);
-        });
-    } catch (error) {
-        logger.fatal(`Faild to load SSL certificate ${error}, exit...`);
-        process.exit();
-    }
+    /** Prefer https. */
+    server = https.createServer(sslOptions, app).listen(Configuration.http.httpsPort, () => {
+      logger.info('HTTPS/SSL listen on port ' + Configuration.http.httpsPort);
+    });
+  } catch (error) {
+    logger.fatal(`Faild to load SSL certificate ${error}, exit...`);
+    process.exit();
+  }
 }
 
 (async () => {
-    try {
-        await createConnection();
-        logger.info('successfully connected to DB.');
+  try {
+    await createConnection();
+    logger.info('successfully connected to DB.');
 
-        const wss = new WebSocket.Server({ server });
-        const channelsRouter = new ChannelsRouter();
-        channelsRouter.IncomingWsChannels(wss);
+    const wss = new WebSocket.Server({ server });
+    const channelsRouter = new ChannelsRouter();
+    channelsRouter.IncomingWsChannels(wss);
 
-        logger.info('listening to WS channels...');
-
-    } catch (error) {
-        logger.fatal('DB connection failed, exiting...', error);
-        process.exit();
-    }
+    logger.info('listening to WS channels...');
+  } catch (error) {
+    logger.fatal('DB connection failed, exiting...', error);
+    process.exit();
+  }
 })();
