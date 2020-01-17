@@ -5,6 +5,7 @@
 ## For what?
 
 The [casanet server](https://github.com/casanet/casanet-server) is running on the local network.
+
 so to get access to the local casanet API outside the home we need to know our home public IP address and configure port forwarding in-home router.
 
 But it not so easy, because some of ISP services giving NAT IP and not public IP, and some other replacing IP addresses each connection,
