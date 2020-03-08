@@ -19,7 +19,7 @@ export class Notifications {
   private notificationTasks: { [key: string]: ServerNotifyTask } = {};
 
   constructor(private channels: Channels) {
-    this.channels.localServersStautsFeed.subscribe(serverStatus => {
+    this.channels.localServersStatusFeed.subscribe(serverStatus => {
       if (!serverStatus) {
         return;
       }

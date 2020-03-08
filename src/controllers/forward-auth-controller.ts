@@ -63,7 +63,7 @@ export class ForwardAuthController extends Controller {
     } else {
       /** Get all local server that user is mention as valid users */
       const userLocalServersInfo = await getServersByForwardUser(login.email);
-      /** If there is not any local server that user is mantion in it. throw it out.  */
+      /** If there is not any local server that user is mention in it. throw it out.  */
       if (userLocalServersInfo.length === 0) {
         this.setStatus(401);
         return;
@@ -105,7 +105,7 @@ export class ForwardAuthController extends Controller {
           }
         }
 
-        /** If non of local servers succfully auth, dont tell attaker info about servers */
+        /** If non of local servers successfully auth, don't tell attacker info about servers */
         this.setStatus(401);
         return;
       }
