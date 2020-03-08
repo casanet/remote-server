@@ -11,6 +11,9 @@ import { expressAuthentication, SystemAuthScopes } from '../security/authenticat
 import { RequestSchemaValidator } from '../security/schemaValidator';
 import { IftttOnChangedSchema } from '../security/schemaValidator';
 
+/** Headers to forward from the local-server to the end-user */
+const HEADERS_TO_FORWARD = ['content-type', 'content-disposition'];
+
 export class ForwardingRouter {
   private forwardingController: ForwardingController = new ForwardingController();
   private localServersController: LocalServersController = new LocalServersController();
@@ -90,9 +93,19 @@ export class ForwardingRouter {
         if (response.httpStatus === 403) {
         }
 
+        /** Copy the local-server headers */
+        if (response.httpHeaders) {
+          for (const header of HEADERS_TO_FORWARD) {
+            const headerValue = response.httpHeaders[header];
+            if (headerValue) {
+              res.setHeader(header, headerValue);
+            }
+          }
+        }
+
         /** Set status and data and send response back */
         res.statusCode = response.httpStatus;
-        res.json(response.httpBody);
+        res.send(response.httpBody);
       } catch (error) {
         res.status(501).send({ responseCode: 5000 } as ErrorResponse);
       }

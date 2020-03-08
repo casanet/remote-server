@@ -40,11 +40,11 @@ export class Channels {
   public localServersFeed = new BehaviorSubject<{ localServerId: string; localServerFeed: LocalServerFeed }>(undefined);
 
   /** Allow subscribe to local servers connection status, for notification, alerts logging etc.  */
-  public localServersStautsFeed = new BehaviorSubject<{ localServerId: string; theNewStatus: boolean }>(undefined);
+  public localServersStatusFeed = new BehaviorSubject<{ localServerId: string; theNewStatus: boolean }>(undefined);
 
   /**
    * Timeout for any http request.
-   * (it long time bacuse of scaning network request that takes a while.)
+   * (it long time because of scanning network request that takes a while.)
    */
   private httpRequestTimeout: moment.Duration = moment.duration(2, 'minutes');
 
@@ -97,7 +97,7 @@ export class Channels {
 
       /** If channel not exist, mean there is no communication with local server. */
       if (!localServeChannel) {
-        /** Send local server not availbe response */
+        /** Send local server not available response */
         resolveHttpReq({
           requestId: httpRequest.requestId,
           httpBody: {
@@ -110,7 +110,7 @@ export class Channels {
         return;
       }
 
-      /** Generate uniqe id to each request to know witch response belong to current request  */
+      /** Generate unique id to each request to know witch response belong to current request  */
       const reqId = randomstring.generate(16);
       httpRequest.requestId = reqId;
 
@@ -123,7 +123,7 @@ export class Channels {
         },
       };
 
-      /** Send request to local server to procces it. */
+      /** Send request to local server to process it. */
       this.sendMessage(localServeChannel, {
         remoteMessagesType: 'httpRequest',
         message: {
@@ -202,7 +202,7 @@ export class Channels {
     logger.info(`Local server ${wsChannel.machineMac} ws channel closed`);
 
     /** Update subscribers with the new local server status */
-    this.localServersStautsFeed.next({ localServerId: wsChannel.machineMac, theNewStatus: false });
+    this.localServersStatusFeed.next({ localServerId: wsChannel.machineMac, theNewStatus: false });
   }
 
   /**
@@ -305,7 +305,7 @@ export class Channels {
       logger.info(`Local server ${localServer.displayName} connected succefully`);
 
       /** Update subscribers with the new local server status */
-      this.localServersStautsFeed.next({ localServerId: certAuth.macAddress, theNewStatus: true });
+      this.localServersStatusFeed.next({ localServerId: certAuth.macAddress, theNewStatus: true });
     } catch (error) {
       logger.debug(`Fail to authenticate local server '${certAuth.macAddress}' connection request`);
 
