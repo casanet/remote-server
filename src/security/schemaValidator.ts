@@ -158,7 +158,7 @@ const httpResponseSchema = Joi.object().keys({
       .required(),
     maxAge: Joi.number().required(),
   }),
-  httpHeaders: Joi.object().pattern(/^/, Joi.string()),
+  httpHeaders: Joi.object().pattern(/^/, Joi.alt(Joi.string(), Joi.array().items(Joi.string()))),
 });
 
 const emptyMessageSchema = Joi.object().keys({});
