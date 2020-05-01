@@ -103,6 +103,11 @@ export class ForwardingRouter {
           }
         }
 
+        // The binary responses sent as base64 string, so decode it back to binary buffer
+        if(response.httpHeaders['content-type'] === 'application/octet-stream') {
+          response.httpBody = Buffer.from(response.httpBody, 'base64');
+        }
+  
         /** Set status and data and send response back */
         res.statusCode = response.httpStatus;
         res.send(response.httpBody);
