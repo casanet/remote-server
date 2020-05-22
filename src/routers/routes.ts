@@ -182,6 +182,8 @@ const models: TsoaRoute.Models = {
             "contactMail": { "dataType": "string" },
             "validUsers": { "dataType": "array", "array": { "dataType": "string" }, "required": true },
             "connectionStatus": { "dataType": "boolean", "required": true },
+            "lastConnection": { "dataType": "double", "required": true },
+            "lastDisconnection": { "dataType": "double", "required": true },
         },
     },
     "LocalServer": {
