@@ -1,6 +1,6 @@
 {
     "http": {
-        "httpPort": 3000,
+        "httpPort": 3001,
         "httpsPort": 443,
         "useHttps": false
     },
