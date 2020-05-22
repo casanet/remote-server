@@ -51,6 +51,10 @@ export class Channels {
   /** Map all local servers ws channel by local server mac address */
   private localChannelsMap: { [key: string]: CasaWs } = {};
 
+  /** Hold the connection/ disconnection timestamp of each local server */
+  private channelsDisconnectionMap: { [key: string]: number } = {};
+  private channelsConnectionMap: { [key: string]: number } = {};
+
   /**
    * Hold each request promise reject/resolve methods.
    * until message will arrive from local server with response for current request.
@@ -198,6 +202,7 @@ export class Channels {
 
     /** Remove it from channel map. */
     delete this.localChannelsMap[wsChannel.machineMac];
+    this.channelsDisconnectionMap[wsChannel.machineMac] = new Date().getTime();
 
     logger.info(`Local server ${wsChannel.machineMac} ws channel closed`);
 
@@ -223,7 +228,7 @@ export class Channels {
 
     /** Remove it from channel map. */
     delete this.localChannelsMap[macAddress];
-
+    this.channelsDisconnectionMap[macAddress] = new Date().getTime();
     logger.info(`Local server ${localServerConnection.machineMac} disconnected by the remote server`);
   }
 
@@ -233,6 +238,22 @@ export class Channels {
    */
   public async connectionStatus(macAddress: string): Promise<boolean> {
     return macAddress in this.localChannelsMap;
+  }
+
+  /**
+   * Get channel connection time stamps.
+   * @param macAddress local server physical address
+   */
+  public async connectionTimeStatus(
+    macAddress: string,
+  ): Promise<{
+    lastConnection: number;
+    lastDisconnection: number;
+  }> {
+    return {
+      lastConnection: this.channelsConnectionMap[macAddress] || 0,
+      lastDisconnection: this.channelsDisconnectionMap[macAddress] || 0,
+    };
   }
 
   /**
@@ -298,6 +319,7 @@ export class Channels {
 
       /** Hold the channel after auth seccess. */
       this.localChannelsMap[certAuth.macAddress] = wsChannel;
+      this.channelsConnectionMap[certAuth.macAddress] = new Date().getTime();
 
       /** Send local server authenticatedSuccessfuly message. */
       this.sendMessage(wsChannel, { remoteMessagesType: 'authenticatedSuccessfuly', message: {} });

@@ -524,11 +524,21 @@ definitions:
             connectionStatus:
                 type: boolean
                 description: 'Is local server connected'
+            lastConnection:
+                type: number
+                format: double
+                description: 'The last local-server connection UTC time'
+            lastDisconnection:
+                type: number
+                format: double
+                description: 'The last local-server disconnection UTC time'
         required:
             - macAddress
             - displayName
             - validUsers
             - connectionStatus
+            - lastConnection
+            - lastDisconnection
         type: object
     LocalServer:
         description: 'Represents a local server in the system.'

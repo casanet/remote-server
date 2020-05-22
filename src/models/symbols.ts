@@ -13,6 +13,10 @@ export declare type AuthScopes = 'forwardAuth' | 'adminAuth' | 'iftttAuth';
 export declare interface LocalServerStatus extends LocalServer {
   /** Is local server connected */
   connectionStatus: boolean;
+  /** The last local-server connection UTC time */
+  lastConnection: number;
+  /** The last local-server disconnection UTC time */
+  lastDisconnection: number;
 }
 
 /**
