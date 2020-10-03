@@ -180,6 +180,8 @@ const models: TsoaRoute.Models = {
             "macAddress": { "dataType": "string", "required": true },
             "displayName": { "dataType": "string", "required": true },
             "contactMail": { "dataType": "string" },
+            "platform": { "dataType": "string" },
+            "version": { "dataType": "string" },
             "validUsers": { "dataType": "array", "array": { "dataType": "string" }, "required": true },
             "connectionStatus": { "dataType": "boolean", "required": true },
             "lastConnection": { "dataType": "double", "required": true },
@@ -191,6 +193,8 @@ const models: TsoaRoute.Models = {
             "macAddress": { "dataType": "string", "required": true },
             "displayName": { "dataType": "string", "required": true },
             "contactMail": { "dataType": "string" },
+            "platform": { "dataType": "string" },
+            "version": { "dataType": "string" },
             "validUsers": { "dataType": "array", "array": { "dataType": "string" }, "required": true },
         },
     },
@@ -420,7 +424,7 @@ export function RegisterRoutes(app: express.Express) {
             const promise = controller.deleteLocalServer.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, next);
         });
-    app.post('/API/servers/auth/:serverId',
+    app.post('/API/servers/:serverId/auth',
         authenticateMiddleware([{ "adminAuth": [] }]),
         function(request: any, response: any, next: any) {
             const args = {
@@ -442,6 +446,31 @@ export function RegisterRoutes(app: express.Express) {
 
 
             const promise = controller.generateAuthKeyLocalServer.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, next);
+        });
+    app.get('/API/servers/:serverId/logs',
+        authenticateMiddleware([{ "adminAuth": [] }]),
+        function(request: any, response: any, next: any) {
+            const args = {
+                request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+                serverId: { "in": "path", "name": "serverId", "required": true, "dataType": "string" },
+            };
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request);
+            } catch (err) {
+                response.status(422).send({
+                    responseCode: 1422,
+                    message: JSON.stringify(err.fields),
+                } as ErrorResponse);
+                return;
+            }
+
+            const controller = new LocalServersController();
+
+
+            const promise = controller.fetchServerLogs.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, next);
         });
     app.post('/API/administration/auth/login',

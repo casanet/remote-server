@@ -11,7 +11,7 @@ export class ChannelsRouter {
   public IncomingWsChannels(wss: WebSocket.Server): void {
     /** When new client connect send it to controller handle it */
     wss.on('connection', (ws: WebSocket) => {
-      this.channelsController.OnChannelOpend(ws);
+      this.channelsController.OnChannelOpened(ws);
     });
   }
 }

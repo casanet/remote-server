@@ -5,12 +5,13 @@ import * as randomstring from 'randomstring';
 import { BehaviorSubject, Observable, Subscriber } from 'rxjs';
 import * as ws from 'ws';
 import { Configuration } from '../config';
-import { checkSession, getServer, updateServer } from '../data-access';
+import { checkSession, getServer, updateServer, updateServerMeta } from '../data-access';
 import { logger } from '../logger';
 import { SendMail } from '../mailSender';
 import {
   HttpRequest,
   HttpResponse,
+  InitializationRequest,
   LocalMessage,
   LocalServerFeed,
   RemoteMessage,
@@ -18,13 +19,13 @@ import {
 import { ErrorResponse, MinionFeed, TimingFeed } from '../models/sharedInterfaces';
 
 /**
- * Extend ws to allow hold uniqe id to each authenticated local server ws channel.
+ * Extend ws to allow hold unique id to each authenticated local server ws channel.
  * This id allow to route user requests to correct local server.
  */
 export interface CasaWs extends ws {
   /**
-   * uniqe identity each local servers.
-   * (Don`t use local server id, becuase local server dont know it.)
+   * unique identity each local servers.
+   * (Don`t use local server id, because local server dont know it.)
    */
   machineMac: string;
 }
@@ -33,7 +34,7 @@ export interface CasaWs extends ws {
  * Manage all local servers ws I/O messages.
  * The main goal is to allow used ws protocol as req/res architecture.
  * So when user send HTTP request it will forward to local server via ws and
- * returns response, evan thet ws is messages architecture based.
+ * returns response, evan that ws is messages architecture based.
  */
 export class Channels {
   /** Feed of local servers feeds. */
@@ -47,6 +48,7 @@ export class Channels {
    * (it long time because of scanning network request that takes a while.)
    */
   private httpRequestTimeout: moment.Duration = moment.duration(2, 'minutes');
+  private logsRequestTimeout: moment.Duration = moment.duration(30, 'seconds');
 
   /** Map all local servers ws channel by local server mac address */
   private localChannelsMap: { [key: string]: CasaWs } = {};
@@ -70,6 +72,20 @@ export class Channels {
   } = {};
 
   /**
+   * Hold each request promise reject/resolve methods map by the local server id.
+   * until message will arrive from local server with response for current request.
+   */
+  private fetchLocalLogsMap: {
+    [key: string]: {
+      timeStamped: Date;
+      forwardPromise: {
+        resolve: (httpResponse: string) => {};
+        reject: (errorResponse: ErrorResponse) => {};
+      };
+    };
+  } = {};
+
+  /**
    * Register generated code map to account with creation timestamp.
    */
   private forwardUserReqAuth: {
@@ -86,7 +102,7 @@ export class Channels {
 
   /**
    * Send http request to local server over ws channel.
-   * @param localServerId local server phisical address to send request for.
+   * @param localServerId local server physical address to send request for.
    * @param httpRequest http request message to send.
    * @returns Http response message.
    */
@@ -137,9 +153,41 @@ export class Channels {
     });
   }
 
+  public async fetchLocalLogsViaChannels(localServerId: string): Promise<string> {
+    /**
+     * Create promise to allow hold resolve/reject in map and wait for local server response.
+     * (like we already know, ws is message based and not req/res based).
+     */
+    return new Promise<string>((resolveLogsReq, rejectLogsReq) => {
+      /** Get correct local server ws channel */
+      const localServeChannel = this.localChannelsMap[localServerId];
+
+      /** If channel not exist, mean there is no communication with local server. */
+      if (!localServeChannel) {
+        /** Send local server not available response */
+        throw new Error('local server not connected');
+      }
+
+      /** Add request promise methods to map  */
+      this.fetchLocalLogsMap[localServerId] = {
+        timeStamped: new Date(),
+        forwardPromise: {
+          reject: rejectLogsReq as () => {},
+          resolve: resolveLogsReq as () => {},
+        },
+      };
+
+      /** Send request to local server to process it. */
+      this.sendMessage(localServeChannel, {
+        remoteMessagesType: 'fetchLogs',
+        message: {},
+      });
+    });
+  }
+
   /**
-   * On ws just opend.
-   * @param wsChannel local server incomming ws.
+   * On ws just opened.
+   * @param wsChannel local server incoming ws.
    */
   public onWsOpen(wsChannel: ws) {
     /** Send to local server ready to init and auth message. */
@@ -158,9 +206,9 @@ export class Channels {
       return;
     }
 
-    /** If ws object not own machine mac, dont allow it to do anything. */
+    /** If ws object not own machine mac, don't allow it to do anything. */
     if (!(wsChannel.machineMac in this.localChannelsMap)) {
-      logger.debug(`aborting local server message, there is no vaild mac address stamp.`);
+      logger.debug(`aborting local server message, there is no valid mac address stamp.`);
       return;
     }
 
@@ -186,6 +234,9 @@ export class Channels {
         break;
       case 'feed':
         await this.handleFeedUpdate(wsChannel, localMessage.message.feed);
+        break;
+      case 'logs':
+        await this.handleLogsResponse(wsChannel.machineMac, localMessage.message.logs);
         break;
     }
   }
@@ -277,6 +328,16 @@ export class Channels {
           });
         }
       }
+
+      for (const [key, value] of Object.entries(this.fetchLocalLogsMap)) {
+        if (now.getTime() - value.timeStamped.getTime() > this.logsRequestTimeout.asMilliseconds()) {
+          delete this.fetchLocalLogsMap[key];
+          value.forwardPromise.reject({
+            responseCode: 8503,
+            message: 'local server timeout',
+          } as ErrorResponse);
+        }
+      }
     }, moment.duration(10, 'seconds').asMilliseconds());
   }
 
@@ -285,10 +346,7 @@ export class Channels {
    * @param wsChannel ws client object.
    * @param certAuth local server auth cert data
    */
-  private async handleInitializationRequest(
-    wsChannel: CasaWs,
-    certAuth: { macAddress: string; remoteAuthKey: string },
-  ) {
+  private async handleInitializationRequest(wsChannel: CasaWs, certAuth: InitializationRequest) {
     try {
       /** Get the local server based on cert mac address. */
       const localServer = await getServer(certAuth.macAddress);
@@ -317,14 +375,19 @@ export class Channels {
        */
       wsChannel.machineMac = certAuth.macAddress;
 
-      /** Hold the channel after auth seccess. */
+      /** Hold the channel after auth success. */
       this.localChannelsMap[certAuth.macAddress] = wsChannel;
       this.channelsConnectionMap[certAuth.macAddress] = new Date().getTime();
 
-      /** Send local server authenticatedSuccessfuly message. */
-      this.sendMessage(wsChannel, { remoteMessagesType: 'authenticatedSuccessfuly', message: {} });
+      /** Send local server authenticatedSuccessfully message. */
+      this.sendMessage(wsChannel, { remoteMessagesType: 'authenticatedSuccessfully', message: {} });
 
-      logger.info(`Local server ${localServer.displayName} connected succefully`);
+      logger.info(`Local server ${localServer.displayName} connected successfully`);
+
+      // if the version or platform was changed, update the server meta
+      if (localServer.platform !== certAuth.platform || localServer.version !== certAuth.version) {
+        await updateServerMeta(certAuth.macAddress, certAuth.platform, certAuth.version);
+      }
 
       /** Update subscribers with the new local server status */
       this.localServersStatusFeed.next({ localServerId: certAuth.macAddress, theNewStatus: true });
@@ -402,6 +465,27 @@ export class Channels {
 
     /** Activate promise resolve method with response as is. */
     sentRequest.forwardPromise.resolve(httpResponse);
+  }
+
+  /**
+   * Handle http response messages from local server.
+   * @param httpResponse response data.
+   */
+  private handleLogsResponse(localServerId: string, data: string) {
+    /** Get request promise methods */
+    const sentRequest = this.fetchLocalLogsMap[localServerId];
+
+    /** If timeout activation delete it. there is nothing else to do. */
+    if (!sentRequest) {
+      /** Too late... */
+      return;
+    }
+
+    /** Remove request promise from map */
+    delete this.fetchLocalLogsMap[localServerId];
+
+    /** Activate promise resolve method with response as is. */
+    sentRequest.forwardPromise.resolve(data);
   }
 
   /**
