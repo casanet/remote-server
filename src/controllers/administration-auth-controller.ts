@@ -45,7 +45,7 @@ export class AdministrationAuthController extends Controller {
   /**
    * Login to the administration system.
    */
-  @Response<void>(201, '2-fatore code sent')
+  @Response<void>(201, '2-factor code sent')
   @Response<ErrorResponse>(501, 'Server error')
   @Response<ErrorResponse>(403, 'Auth fail')
   @Response<ErrorResponse>(422, 'Invalid schema')
@@ -178,7 +178,7 @@ export class AdministrationAuthController extends Controller {
     this.setHeader(
       'Set-Cookie',
       `admin_session=${token}; Max-Age=${maxAgeInSec}; Path=/; HttpOnly; ${isHttpsOnly ? 'Secure' : ''}; SameSite=${
-        forceSameDomain ? 'Strict' : 'None'
+        forceSameDomain ? 'Strict' : 'Lax'
       };`,
     );
   }
