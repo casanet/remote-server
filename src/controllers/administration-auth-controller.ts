@@ -178,7 +178,7 @@ export class AdministrationAuthController extends Controller {
     this.setHeader(
       'Set-Cookie',
       `admin_session=${token}; Max-Age=${maxAgeInSec}; Path=/; HttpOnly; ${isHttpsOnly ? 'Secure' : ''}; SameSite=${
-        forceSameDomain ? 'Strict' : 'Lax'
+        forceSameDomain ? 'Strict' : (Configuration.runningMode === 'debug' ? 'Lax' : 'None')
       };`,
     );
   }
