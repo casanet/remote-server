@@ -28,14 +28,14 @@ export class ChannelsController extends Controller {
    * Handle new channel from local server.
    * @param wsChannels client web socket channel.
    */
-  public OnChannelOpend(wsChannels: ws) {
+  public OnChannelOpened(wsChannels: ws) {
     /** When message arrived, try parse it to 'LocalMessage' and send it to BL */
     wsChannels.on('message', async msg => {
       try {
         const localMessage: LocalMessage = await SchemaValidator(JSON.parse(msg as string), LocalMessageSchema);
         ChannelsSingleton.onWsMessage(wsChannels as CasaWs, localMessage);
       } catch (error) {
-        logger.debug('ws message parse fail.');
+        logger.warn('ws message parse failed');
       }
     });
 

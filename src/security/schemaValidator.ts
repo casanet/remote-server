@@ -142,6 +142,12 @@ const initSchema = Joi.object().keys({
   remoteAuthKey: Joi.string()
     .not('')
     .required(),
+  platform: Joi.string()
+    .not('')
+    .required(),
+  version: Joi.string()
+    .not('')
+    .required(),
 });
 
 const httpResponseSchema = Joi.object().keys({
@@ -179,6 +185,7 @@ export const LocalMessageSchema: ObjectSchema = Joi.object()
       'httpResponse',
       'ack',
       'feed',
+      'logs',
     ).required(),
     message: Joi.alternatives()
       .when('localMessagesType', {
@@ -223,6 +230,16 @@ export const LocalMessageSchema: ObjectSchema = Joi.object()
         is: 'feed',
         then: Joi.object()
           .keys({ feed: feedSchema.required() })
+          .required(),
+      })
+      .when('localMessagesType', {
+        is: 'logs',
+        then: Joi.object()
+          .keys({
+            logs: Joi.string()
+              .base64()
+              .required(),
+          })
           .required(),
       }),
   })

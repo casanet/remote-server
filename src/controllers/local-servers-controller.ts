@@ -1,4 +1,5 @@
 import * as cryptoJs from 'crypto-js';
+import * as express from 'express';
 import * as randomstring from 'randomstring';
 import {
   Body,
@@ -18,6 +19,7 @@ import {
 } from 'tsoa';
 import { Configuration } from '../config';
 import { createServer, deleteServer, getServer, getServers, setServerSession, updateServer } from '../data-access';
+import { logger } from '../logger';
 import { ChannelsSingleton } from '../logic';
 import { LocalServer, LocalServerStatus, ServerSession } from '../models';
 import { ErrorResponse } from '../models/sharedInterfaces';
@@ -101,7 +103,7 @@ export class LocalServersController extends Controller {
    */
   @Security('adminAuth')
   @Response<ErrorResponse>(501, 'Server error')
-  @Post('auth/{serverId}')
+  @Post('{serverId}/auth')
   public async generateAuthKeyLocalServer(serverId: string): Promise<string> {
     const server = await getServer(serverId);
 
@@ -126,5 +128,23 @@ export class LocalServersController extends Controller {
     await ChannelsSingleton.disconnectLocalServer(serverId);
 
     return await sessionKey;
+  }
+
+  /**
+   * Fetch local server logs.
+   * @param serverId local server physical address.
+   */
+  @Security('adminAuth')
+  @Response<ErrorResponse>(501, 'Server error')
+  @Get('{serverId}/logs')
+  public async fetchServerLogs(@Request() request: express.Request, serverId: string) {
+    logger.info(`[LocalServersController.fetchServerLogs] Feting ${serverId} server logs request arrived`);
+    const base64Logs = await ChannelsSingleton.fetchLocalLogsViaChannels(serverId);
+    logger.info(`[LocalServersController.fetchServerLogs] Converting ${serverId} server logs to buffer...`);
+    const file = Buffer.from(base64Logs, 'base64');
+    const res = request.res as express.Response;
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.end(file);
+    logger.info(`[LocalServersController.fetchServerLogs] The ${serverId} server logs sent`);
   }
 }

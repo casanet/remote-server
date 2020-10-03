@@ -516,6 +516,14 @@ definitions:
                 type: string
                 description: 'Contact mail, allow null case there is no contact defined'
                 x-nullable: true
+            platform:
+                type: string
+                description: 'The platform OS of the local sever (data received on init)'
+                x-nullable: true
+            version:
+                type: string
+                description: 'The local server version'
+                x-nullable: true
             validUsers:
                 type: array
                 items:
@@ -552,6 +560,14 @@ definitions:
             contactMail:
                 type: string
                 description: 'Contact mail, allow null case there is no contact defined'
+                x-nullable: true
+            platform:
+                type: string
+                description: 'The platform OS of the local sever (data received on init)'
+                x-nullable: true
+            version:
+                type: string
+                description: 'The local server version'
                 x-nullable: true
             validUsers:
                 type: array
@@ -819,7 +835,7 @@ paths:
                     name: serverId
                     required: true
                     type: string
-    '/servers/auth/{serverId}':
+    '/servers/{serverId}/auth':
         post:
             operationId: GenerateAuthKeyLocalServer
             produces:
@@ -846,6 +862,31 @@ paths:
                     name: serverId
                     required: true
                     type: string
+    '/servers/{serverId}/logs':
+        get:
+            operationId: FetchServerLogs
+            produces:
+                - application/json
+            responses:
+                '204':
+                    description: 'No content'
+                '501':
+                    description: 'Server error'
+                    schema:
+                        $ref: '#/definitions/ErrorResponse'
+            description: 'Fetch local server logs.'
+            tags:
+                - Servers
+            security:
+                -
+                    adminAuth: []
+            parameters:
+                -
+                    description: 'local server physical address.'
+                    in: path
+                    name: serverId
+                    required: true
+                    type: string
     /administration/auth/login:
         post:
             operationId: AdministrationLogin
@@ -853,7 +894,7 @@ paths:
                 - application/json
             responses:
                 '201':
-                    description: '2-fatore code sent'
+                    description: '2-factor code sent'
                 '204':
                     description: 'No content'
                 '403':

@@ -34,6 +34,14 @@ export const updateServer = async (server: LocalServer): Promise<void> => {
   });
 };
 
+export const updateServerMeta = async (macAddress: string, platform: string, version: string): Promise<void> => {
+  const serversRepository = getConnection().getRepository(LocalServer);
+  await serversRepository.update(macAddress, {
+    platform,
+    version,
+  });
+};
+
 export const createServer = async (server: LocalServer): Promise<void> => {
   const serversRepository = getConnection().getRepository(LocalServer);
   await serversRepository.insert(new LocalServer(server));
