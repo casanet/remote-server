@@ -52,6 +52,8 @@ export const serverSchema: ObjectSchema = Joi.object()
     validUsers: Joi.array()
       .items(Joi.string().email())
       .required(),
+    platform: Joi.allow(''),
+    version: Joi.allow(''),
   })
   .required();
 
