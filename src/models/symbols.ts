@@ -5,7 +5,7 @@ import { LocalServer } from './';
  * Scopes of authentication, right know in our system there are only 3 scopes.
  * admin and user. any API route protect by one of them.
  */
-export declare type AuthScopes = 'forwardAuth' | 'adminAuth' | 'iftttAuth';
+export declare type AuthScopes = 'forwardAuth' | 'adminAuth' | 'iftttAuth' | 'rfRepositoryAuth';
 
 /**
  * Info about local server status
@@ -48,4 +48,12 @@ export declare interface ForwardSession {
   session: string;
   /** session owner */
   localUser: string;
+}
+
+/**
+ * Local server certificates to validate
+ */
+export declare interface ServerCertificates {
+  mac: string;
+  key: string;
 }

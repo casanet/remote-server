@@ -198,6 +198,12 @@ const models: TsoaRoute.Models = {
             "validUsers": { "dataType": "array", "array": { "dataType": "string" }, "required": true },
         },
     },
+    "ServerCertificates": {
+        "properties": {
+            "mac": { "dataType": "string", "required": true },
+            "key": { "dataType": "string", "required": true },
+        },
+    },
     "Login": {
         "properties": {
             "email": { "dataType": "string", "required": true },
@@ -471,6 +477,31 @@ export function RegisterRoutes(app: express.Express) {
 
 
             const promise = controller.fetchServerLogs.apply(controller, validatedArgs as any);
+            promiseHandler(controller, promise, response, next);
+        });
+    app.post('/API/servers/verification',
+        authenticateMiddleware([{ "rfRepositoryAuth": [] }]),
+        function(request: any, response: any, next: any) {
+            const args = {
+                request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+                serverCertificates: { "in": "body", "name": "serverCertificates", "required": true, "ref": "ServerCertificates" },
+            };
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request);
+            } catch (err) {
+                response.status(422).send({
+                    responseCode: 1422,
+                    message: JSON.stringify(err.fields),
+                } as ErrorResponse);
+                return;
+            }
+
+            const controller = new LocalServersController();
+
+
+            const promise = controller.serverVerification.apply(controller, validatedArgs as any);
             promiseHandler(controller, promise, response, next);
         });
     app.post('/API/administration/auth/login',

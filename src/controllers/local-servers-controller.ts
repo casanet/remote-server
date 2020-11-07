@@ -18,10 +18,10 @@ import {
   Tags,
 } from 'tsoa';
 import { Configuration } from '../config';
-import { createServer, deleteServer, getServer, getServers, setServerSession, updateServer } from '../data-access';
+import { createServer, deleteServer, getServer, getServers, setServerSession, updateServer, verifyAndGetLocalServer } from '../data-access';
 import { logger } from '../logger';
 import { ChannelsSingleton } from '../logic';
-import { LocalServer, LocalServerStatus, ServerSession } from '../models';
+import { LocalServer, LocalServerStatus, ServerCertificates, ServerSession } from '../models';
 import { ErrorResponse } from '../models/sharedInterfaces';
 import { SchemaValidator, serverSchema } from '../security/schemaValidator';
 
@@ -127,7 +127,7 @@ export class LocalServersController extends Controller {
     /** Disconnect local server (if connected) */
     await ChannelsSingleton.disconnectLocalServer(serverId);
 
-    return await sessionKey;
+    return sessionKey;
   }
 
   /**
@@ -146,5 +146,14 @@ export class LocalServersController extends Controller {
     res.setHeader('Content-Type', 'application/octet-stream');
     res.end(file);
     logger.info(`[LocalServersController.fetchServerLogs] The ${serverId} server logs sent`);
+  }
+
+  
+  @Security('rfRepositoryAuth')
+  @Response<ErrorResponse>(501, 'Server error')
+  @Post('verification')
+  public async serverVerification(@Request() request: express.Request, @Body() serverCertificates: ServerCertificates) : Promise<LocalServer> {
+    logger.info(`[LocalServersController.fetchServerLogs] Detecting ${serverCertificates.key} server certificates`);
+    return await verifyAndGetLocalServer(serverCertificates);
   }
 }

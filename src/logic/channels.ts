@@ -5,7 +5,7 @@ import * as randomstring from 'randomstring';
 import { BehaviorSubject, Observable, Subscriber } from 'rxjs';
 import * as ws from 'ws';
 import { Configuration } from '../config';
-import { checkSession, getServer, updateServer, updateServerMeta } from '../data-access';
+import { checkSession, getServer, updateServer, updateServerMeta, verifyAndGetLocalServer } from '../data-access';
 import { logger } from '../logger';
 import { SendMail } from '../mailSender';
 import {
@@ -349,19 +349,14 @@ export class Channels {
   private async handleInitializationRequest(wsChannel: CasaWs, certAuth: InitializationRequest) {
     try {
       /** Get the local server based on cert mac address. */
-      const localServer = await getServer(certAuth.macAddress);
-
-      await checkSession(
-        localServer,
-        cryptoJs.SHA512(certAuth.remoteAuthKey + Configuration.keysHandling.saltHash).toString(),
-      );
+      const localServer = await verifyAndGetLocalServer({ mac : certAuth.macAddress, key : certAuth.remoteAuthKey });
 
       /** If there is other channel from same local server */
       if (this.localChannelsMap[certAuth.macAddress]) {
         /** Remove authentication for any case.  */
         this.localChannelsMap[certAuth.macAddress].machineMac = null;
 
-        /** Need to test the behavior of local server when closing old connection manualy  */
+        /** Need to test the behavior of local server when closing old connection manually  */
         try {
           this.localChannelsMap[certAuth.macAddress].close();
         } catch (err) {}

@@ -579,6 +579,16 @@ definitions:
             - displayName
             - validUsers
         type: object
+    ServerCertificates:
+        properties:
+            mac:
+                type: string
+            key:
+                type: string
+        required:
+            - mac
+            - key
+        type: object
     Login:
         description: 'Login schema model.'
         properties:
@@ -887,6 +897,32 @@ paths:
                     name: serverId
                     required: true
                     type: string
+    /servers/verification:
+        post:
+            operationId: ServerVerification
+            produces:
+                - application/json
+            responses:
+                '200':
+                    description: Ok
+                    schema:
+                        $ref: '#/definitions/LocalServer'
+                '501':
+                    description: 'Server error'
+                    schema:
+                        $ref: '#/definitions/ErrorResponse'
+            tags:
+                - Servers
+            security:
+                -
+                    rfRepositoryAuth: []
+            parameters:
+                -
+                    in: body
+                    name: serverCertificates
+                    required: true
+                    schema:
+                        $ref: '#/definitions/ServerCertificates'
     /administration/auth/login:
         post:
             operationId: AdministrationLogin
