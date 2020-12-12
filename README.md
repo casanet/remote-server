@@ -1,6 +1,6 @@
 # Casanet remote server.
 
-[![Build Status](https://travis-ci.org/casanet/remote-server.svg?branch=master)](https://travis-ci.org/casanet/remote-server)
+[![CI CD Status](https://github.com/casanet/casanet-server/workflows/Casanet%Remote%20CI%20CD/badge.svg?branch=master)](https://github.com/casanet/remote-server/actions)
 
 ## For what?
 
