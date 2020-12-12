@@ -18,6 +18,8 @@ if (!jwtSecret) {
   process.exit();
 }
 
+const RF_REPOSITORY_API_KEY = process.env.RF_REPOSITORY_API_KEY;
+
 /**
  * System auth scopes, shown in swagger doc as 2 kinds of security definitions.
  */
@@ -25,10 +27,12 @@ export const SystemAuthScopes: {
   forwardScope: AuthScopes;
   adminScope: AuthScopes;
   iftttScope: AuthScopes;
+  rfRepositoryAuth: AuthScopes;
 } = {
   forwardScope: 'forwardAuth',
   adminScope: 'adminAuth',
   iftttScope: 'iftttAuth',
+  rfRepositoryAuth: 'rfRepositoryAuth',
 };
 
 export const forwardCache = new Cache(
@@ -37,7 +41,7 @@ export const forwardCache = new Cache(
 );
 
 /**
- * Cert Authentication middelwhere API.
+ * Cert Authentication middleware API.
  * the auth token should be the value of 'session' cookie.
  * @param securityName Used as auth scope beacuse of poor scopes swaggger support in apiKey auth.
  */
@@ -60,6 +64,18 @@ export const expressAuthentication = async (
     const { apiKey, localMac } = request.body as IftttActionTriggeredRequest;
     await SchemaValidator({ apiKey, localMac }, IftttAuthRequestSchema);
     return;
+  }
+
+  /** Handle Rf commands repo API requests */
+  if (scopes.includes(SystemAuthScopes.rfRepositoryAuth)) {
+    if (!RF_REPOSITORY_API_KEY) {
+      logger.warn('In order to enable the Rf command repo API please set the "RF_REPOSITORY_API_KEY" env var!');
+    } else if (RF_REPOSITORY_API_KEY === request.headers['rf-repository-api-key']) {
+      return;
+    }
+    throw {
+      responseCode: 1403,
+    } as ErrorResponse;
   }
 
   const jwtSession =
