@@ -9,9 +9,9 @@ export async function verifyAndGetLocalServer(serverCertificates: ServerCertific
   const localServer = await getServer(serverCertificates.mac);
 
   await checkSession(
-      localServer,
-      cryptoJs.SHA512(serverCertificates.key + Configuration.keysHandling.saltHash).toString(),
-    );
+    localServer,
+    cryptoJs.SHA512(serverCertificates.key + Configuration.keysHandling.saltHash).toString(),
+  );
 
   return localServer;
 }

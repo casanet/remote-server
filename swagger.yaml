@@ -580,6 +580,7 @@ definitions:
             - validUsers
         type: object
     ServerCertificates:
+        description: 'Local server certificates to validate'
         properties:
             mac:
                 type: string

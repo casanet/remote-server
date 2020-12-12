@@ -68,8 +68,7 @@ export const expressAuthentication = async (
 
   /** Handle Rf commands repo API requests */
   if (scopes.includes(SystemAuthScopes.rfRepositoryAuth)) {
-
-    if(!RF_REPOSITORY_API_KEY){
+    if (!RF_REPOSITORY_API_KEY) {
       logger.warn('In order to enable the Rf command repo API please set the "RF_REPOSITORY_API_KEY" env var!');
     } else if (RF_REPOSITORY_API_KEY === request.headers['rf-repository-api-key']) {
       return;

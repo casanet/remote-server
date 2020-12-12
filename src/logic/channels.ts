@@ -349,7 +349,7 @@ export class Channels {
   private async handleInitializationRequest(wsChannel: CasaWs, certAuth: InitializationRequest) {
     try {
       /** Get the local server based on cert mac address. */
-      const localServer = await verifyAndGetLocalServer({ mac : certAuth.macAddress, key : certAuth.remoteAuthKey });
+      const localServer = await verifyAndGetLocalServer({ mac: certAuth.macAddress, key: certAuth.remoteAuthKey });
 
       /** If there is other channel from same local server */
       if (this.localChannelsMap[certAuth.macAddress]) {
