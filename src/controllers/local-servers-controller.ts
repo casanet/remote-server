@@ -19,6 +19,7 @@ import {
 } from 'tsoa';
 import { Configuration } from '../config';
 import { createServer, deleteServer, getServer, getServers, setServerSession, updateServer, verifyAndGetLocalServer } from '../data-access';
+import { createServer, deleteServer, getServer, getServers, setServerSession, updateServer } from '../data-access';
 import { logger } from '../logger';
 import { ChannelsSingleton } from '../logic';
 import { LocalServer, LocalServerStatus, ServerCertificates, ServerSession } from '../models';
@@ -155,5 +156,23 @@ export class LocalServersController extends Controller {
   public async serverVerification(@Request() request: express.Request, @Body() serverCertificates: ServerCertificates) : Promise<LocalServer> {
     logger.info(`[LocalServersController.fetchServerLogs] Detecting ${serverCertificates.key} server certificates`);
     return await verifyAndGetLocalServer(serverCertificates);
+  }
+
+  /**
+   * Fetch local server logs.
+   * @param serverId local server physical address.
+   */
+  @Security('adminAuth')
+  @Response<ErrorResponse>(501, 'Server error')
+  @Get('{serverId}/logs')
+  public async fetchServerLogs(@Request() request: express.Request, serverId: string) {
+    logger.info(`[LocalServersController.fetchServerLogs] Feting ${serverId} server logs request arrived`);
+    const base64Logs = await ChannelsSingleton.fetchLocalLogsViaChannels(serverId);
+    logger.info(`[LocalServersController.fetchServerLogs] Converting ${serverId} server logs to buffer...`);
+    const file = Buffer.from(base64Logs, 'base64');
+    const res = request.res as express.Response;
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.end(file);
+    logger.info(`[LocalServersController.fetchServerLogs] The ${serverId} server logs sent`);
   }
 }
