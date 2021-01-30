@@ -14,7 +14,7 @@ declare interface ServerNotifyTask {
  * Handle system notifications and alerts.
  */
 export class Notifications {
-  private NOTIFICATION_TIME_WINDOW: moment.Duration = moment.duration(2, 'minutes');
+  private NOTIFICATION_TIME_WINDOW: moment.Duration = moment.duration(+process.env.NOTIFICATION_CONNECTION_EVENT_MINUTES_WINDOW || 2, 'minutes');
 
   private notificationTasks: { [key: string]: ServerNotifyTask } = {};
 
@@ -26,7 +26,7 @@ export class Notifications {
 
       try {
         this.handleServerConnectionStatusChanged(serverStatus);
-      } catch (error) {}
+      } catch (error) { }
     });
   }
 
