@@ -51,7 +51,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.5.2",
     "tsoa": "2.4.3",
-    "typeorm": "^0.2.18",
+    "typeorm": "^0.2.25",
     "ws": "^6.2.1"
   },
   "devDependencies": {
