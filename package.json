@@ -52,7 +52,7 @@
     "rxjs": "^6.5.2",
     "tsoa": "2.4.3",
     "typeorm": "^0.2.32",
-    "ws": "^6.2.1"
+    "ws": "^6.2.2"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
