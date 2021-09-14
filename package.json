@@ -46,13 +46,13 @@
     "node-cache": "^4.2.0",
     "nodemailer": "^6.6.0",
     "path": "^0.12.7",
-    "pg": "^7.11.0",
+    "pg": "^8.7.1",
     "randomstring": "^1.1.5",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.5.2",
     "tsoa": "2.4.3",
-    "typeorm": "^0.2.32",
-    "ws": "^6.2.1"
+    "typeorm": "^0.2.37",
+    "ws": "^6.2.2"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
