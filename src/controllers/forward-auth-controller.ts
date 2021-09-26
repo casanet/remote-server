@@ -25,7 +25,7 @@ import { ForwardSession, LocalServerInfo, LoginLocalServer } from '../models';
 import { HttpResponse } from '../models/remote2localProtocol';
 import { ErrorResponse, Login, User } from '../models/sharedInterfaces';
 import { forwardCache, jwtSecret, SessionPayload, SystemAuthScopes, USER_AUTHENTICATION_HEADER, USER_SESSION_COOKIE_NAME } from '../security/authentication';
-import { LoginLocalServerSchema, RequestSchemaValidator, SchemaValidator } from '../security/schemaValidator';
+import { LoginLocalServerSchema, LoginTfaLocalServerSchema, RequestSchemaValidator, SchemaValidator } from '../security/schemaValidator';
 
 /**
  * Manage local servers login requests forwarding
@@ -149,7 +149,7 @@ export class ForwardAuthController extends Controller {
     /** See comments in login function, its almost same. */
 
     try {
-      login = await SchemaValidator(login, LoginLocalServerSchema);
+      login = await SchemaValidator(login, LoginTfaLocalServerSchema);
     } catch (err) {
       this.setStatus(422);
       return err.error.message;
