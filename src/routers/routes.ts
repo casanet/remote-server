@@ -238,6 +238,13 @@ const models: TsoaRoute.Models = {
             "localServerId": { "dataType": "string" },
         },
     },
+    "MfaLoginLocalServer": {
+        "properties": {
+            "email": { "dataType": "string", "required": true },
+            "mfa": { "dataType": "string", "required": true },
+            "localServerId": { "dataType": "string" },
+        },
+    },
 };
 const validationService = new ValidationService(models);
 
@@ -767,7 +774,7 @@ export function RegisterRoutes(app: express.Express) {
         function(request: any, response: any, next: any) {
             const args = {
                 request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
-                login: { "in": "body", "name": "login", "required": true, "ref": "LoginLocalServer" },
+                login: { "in": "body", "name": "login", "required": true, "ref": "MfaLoginLocalServer" },
             };
 
             let validatedArgs: any[] = [];
