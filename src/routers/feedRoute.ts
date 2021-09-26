@@ -35,6 +35,14 @@ export class FeedRouter {
 
     app.get('/API/feed/timings', async (request: express.Request, response: express.Response) => {
       try {
+				/** 
+				 * Allow send the authentication key via query in SSE (only)
+				 * - used when not using cookies but authentication header as authorization for REST request
+				 */
+				 if (request.query[USER_AUTHENTICATION_HEADER]) {
+					request.headers[USER_AUTHENTICATION_HEADER] = request.query[USER_AUTHENTICATION_HEADER] as any;
+				}
+
         /**
          * Make sure it is valid local server user with valid session.
          */
