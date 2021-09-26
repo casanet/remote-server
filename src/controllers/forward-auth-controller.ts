@@ -65,7 +65,7 @@ export class ForwardAuthController extends Controller {
       const userLocalServersInfo = await getServersByForwardUser(login.email);
       /** If there is not any local server that user is mention in it. throw it out.  */
       if (userLocalServersInfo.length === 0) {
-        this.setStatus(401);
+        this.setStatus(403);
         return;
       } else if (userLocalServersInfo.length === 1) {
         /** If user is mention in one local server, use it and continue. */
@@ -90,7 +90,7 @@ export class ForwardAuthController extends Controller {
             httpSession: '',
           });
 
-          /** If the local server authenticate request certificate let client select whitch local server he wants to connect */
+          /** If the local server authenticate request certificate let client select which local server he wants to connect */
           if (localLoginCheckResponse.httpStatus === 200 || localLoginCheckResponse.httpStatus === 204) {
             /** Mark 210 http status code. */
             this.setStatus(210);
@@ -106,7 +106,7 @@ export class ForwardAuthController extends Controller {
         }
 
         /** If non of local servers successfully auth, don't tell attacker info about servers */
-        this.setStatus(401);
+        this.setStatus(403);
         return;
       }
     }
@@ -125,11 +125,11 @@ export class ForwardAuthController extends Controller {
       return await this.activeSession(connectLocalServerId, login.email, localResponse);
     }
 
-    /** If request fail becuase that local server not conected,
-     * hide this info from user, case attaker want to know if username valid.
+    /** If request fail because that local server not connected,
+     * hide this info from user, case attacker want to know if username valid.
      */
     if (localResponse.httpStatus === 501 && localResponse.httpBody && localResponse.httpBody.responseCode === 4501) {
-      this.setStatus(401);
+      this.setStatus(403);
       return;
     }
 
