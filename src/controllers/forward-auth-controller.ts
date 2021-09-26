@@ -24,7 +24,7 @@ import { ChannelsSingleton } from '../logic';
 import { ForwardSession, LocalServerInfo, LoginLocalServer } from '../models';
 import { HttpResponse } from '../models/remote2localProtocol';
 import { ErrorResponse, Login, User } from '../models/sharedInterfaces';
-import { forwardCache, jwtSecret, SessionPayload, SystemAuthScopes } from '../security/authentication';
+import { forwardCache, jwtSecret, SessionPayload, SystemAuthScopes, USER_AUTHENTICATION_HEADER, USER_SESSION_COOKIE_NAME } from '../security/authentication';
 import { LoginLocalServerSchema, RequestSchemaValidator, SchemaValidator } from '../security/schemaValidator';
 
 /**
@@ -65,7 +65,7 @@ export class ForwardAuthController extends Controller {
       const userLocalServersInfo = await getServersByForwardUser(login.email);
       /** If there is not any local server that user is mention in it. throw it out.  */
       if (userLocalServersInfo.length === 0) {
-        this.setStatus(401);
+        this.setStatus(403);
         return;
       } else if (userLocalServersInfo.length === 1) {
         /** If user is mention in one local server, use it and continue. */
@@ -90,7 +90,7 @@ export class ForwardAuthController extends Controller {
             httpSession: '',
           });
 
-          /** If the local server authenticate request certificate let client select whitch local server he wants to connect */
+          /** If the local server authenticate request certificate let client select which local server he wants to connect */
           if (localLoginCheckResponse.httpStatus === 200 || localLoginCheckResponse.httpStatus === 204) {
             /** Mark 210 http status code. */
             this.setStatus(210);
@@ -106,7 +106,7 @@ export class ForwardAuthController extends Controller {
         }
 
         /** If non of local servers successfully auth, don't tell attacker info about servers */
-        this.setStatus(401);
+        this.setStatus(403);
         return;
       }
     }
@@ -125,11 +125,11 @@ export class ForwardAuthController extends Controller {
       return await this.activeSession(connectLocalServerId, login.email, localResponse);
     }
 
-    /** If request fail becuase that local server not conected,
-     * hide this info from user, case attaker want to know if username valid.
+    /** If request fail because that local server not connected,
+     * hide this info from user, case attacker want to know if username valid.
      */
     if (localResponse.httpStatus === 501 && localResponse.httpBody && localResponse.httpBody.responseCode === 4501) {
-      this.setStatus(401);
+      this.setStatus(403);
       return;
     }
 
@@ -220,7 +220,7 @@ export class ForwardAuthController extends Controller {
     // TODO: add to tokens black list
     /** Send clean session by response to client browser token. */
     // tslint:disable-next-line:max-line-length
-    this.setHeader('Set-Cookie', `session=null; Max-Age=${1}; Path=/; HttpOnly; SameSite=Strict`);
+    this.setHeader('Set-Cookie', `${USER_SESSION_COOKIE_NAME}=null; Max-Age=${1}; Path=/; HttpOnly; SameSite=Strict`);
   }
 
   private async activeSession(localServerMacAddress: string, localUser: string, httpResponse: HttpResponse) {
@@ -236,13 +236,18 @@ export class ForwardAuthController extends Controller {
     sessionPayload.scope = SystemAuthScopes.forwardScope;
     const token = jwt.sign(sessionPayload, jwtSecret, { expiresIn: ms(httpResponse.httpSession.maxAge * 1000) });
 
+		/** Copy the local-server headers */
+		this.setHeader(USER_AUTHENTICATION_HEADER, token);
+		this.setHeader('Access-Control-Allow-Headers', 'Authorization');
+		this.setHeader('Access-Control-Expose-Headers', 'Authentication');
+	
     const maxAgeInSec = httpResponse.httpSession.maxAge;
     const isHttpsOnly = Configuration.http.useHttps || process.env.APP_BEHIND_PROXY_REDIRECT_HTTPS;
     const forceSameDomain = process.env.SAME_SITE_POLICY !== 'false';
     // tslint:disable-next-line:max-line-length
     this.setHeader(
       'Set-Cookie',
-      `session=${token}; Max-Age=${maxAgeInSec}; Path=/; HttpOnly; ${isHttpsOnly ? 'Secure' : ''}; SameSite=${
+      `${USER_SESSION_COOKIE_NAME}=${token}; Max-Age=${maxAgeInSec}; Path=/; HttpOnly; ${isHttpsOnly ? 'Secure' : ''}; SameSite=${
         forceSameDomain ? 'Strict' : 'None'
       };`,
     );

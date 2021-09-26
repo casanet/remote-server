@@ -18,6 +18,11 @@ if (!jwtSecret) {
   process.exit();
 }
 
+export const USER_AUTHENTICATION_HEADER = 'authentication';
+export const USER_SESSION_COOKIE_NAME = 'session';
+
+export const ADMIN_SESSION_COOKIE_NAME = 'admin_session';
+
 const RF_REPOSITORY_API_KEY = process.env.RF_REPOSITORY_API_KEY;
 
 /**
@@ -74,19 +79,26 @@ export const expressAuthentication = async (
       return;
     }
     throw {
-      responseCode: 1403,
+      responseCode: 1401,
     } as ErrorResponse;
   }
 
+	// If the authentication header sent, use it as the token.
+	// Note, that as default in production the token saved only in a secure cookie to avoid XSS.
+	// But we still support using API with authentication header
+	if (request.headers[USER_AUTHENTICATION_HEADER]) {
+		request.cookies[USER_SESSION_COOKIE_NAME] = request.headers[USER_AUTHENTICATION_HEADER] as string;
+	}
+
   const jwtSession =
-    scopes.indexOf(SystemAuthScopes.adminScope) !== -1 ? request.cookies.admin_session : request.cookies.session;
+    scopes.indexOf(SystemAuthScopes.adminScope) !== -1 ? request.cookies[ADMIN_SESSION_COOKIE_NAME] : request.cookies[USER_SESSION_COOKIE_NAME];
   /**
    * If the session cookie empty,
    * there is nothing to check.
    */
   if (!jwtSession) {
     throw {
-      responseCode: 1403,
+      responseCode: 1401,
     } as ErrorResponse;
   }
 
@@ -99,6 +111,6 @@ export const expressAuthentication = async (
   }
 
   throw {
-    responseCode: 1403,
+    responseCode: 1401,
   } as ErrorResponse;
 };

@@ -24,7 +24,7 @@ import { logger } from '../logger';
 import { SendMail } from '../mailSender';
 import { RemoteAdmin } from '../models';
 import { ErrorResponse, Login, LoginMfa } from '../models/sharedInterfaces';
-import { jwtSecret, SystemAuthScopes } from '../security/authentication';
+import { ADMIN_SESSION_COOKIE_NAME, jwtSecret, SystemAuthScopes } from '../security/authentication';
 import { LoginMfaSchema, LoginSchema, SchemaValidator } from '../security/schemaValidator';
 
 const jwtExpiresIn = process.env.ADMIN_JWT_EXPIRES_IN || '2 days';
@@ -154,7 +154,7 @@ export class AdministrationAuthController extends Controller {
     /** Currently there is no blacklist of invalid tokens */
 
     /** Send clean session by response to client browser. */
-    this.setHeader('Set-Cookie', `admin_session=0;  Path=/;`);
+    this.setHeader('Set-Cookie', `${ADMIN_SESSION_COOKIE_NAME}=0;  Path=/;`);
   }
 
   private async activeSession(admin: RemoteAdmin): Promise<void> {
@@ -177,7 +177,7 @@ export class AdministrationAuthController extends Controller {
     // tslint:disable-next-line:max-line-length
     this.setHeader(
       'Set-Cookie',
-      `admin_session=${token}; Max-Age=${maxAgeInSec}; Path=/; HttpOnly; ${isHttpsOnly ? 'Secure' : ''}; SameSite=${
+      `${ADMIN_SESSION_COOKIE_NAME}=${token}; Max-Age=${maxAgeInSec}; Path=/; HttpOnly; ${isHttpsOnly ? 'Secure' : ''}; SameSite=${
         forceSameDomain ? 'Strict' : Configuration.runningMode === 'debug' ? 'Lax' : 'None'
       };`,
     );
