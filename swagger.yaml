@@ -661,6 +661,21 @@ definitions:
             - email
             - password
         type: object
+    MfaLoginLocalServer:
+        description: "Extends LocalMfaLogin with local server selection,\r\ncase use owns more than one local server needs to know which server to connect."
+        properties:
+            email:
+                type: string
+            mfa:
+                type: string
+            localServerId:
+                type: string
+                description: "Local server to login to.\r\nif the user exists only in one local server ignore the field."
+                x-nullable: true
+        required:
+            - email
+            - mfa
+        type: object
 info:
     title: 'CASAnet - remote server API'
     version: 2.1.0
@@ -1240,7 +1255,7 @@ paths:
                     name: login
                     required: true
                     schema:
-                        $ref: '#/definitions/LoginLocalServer'
+                        $ref: '#/definitions/MfaLoginLocalServer'
     /auth/logout:
         post:
             operationId: Logout
