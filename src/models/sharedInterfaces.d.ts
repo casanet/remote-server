@@ -60,6 +60,14 @@ export declare interface Login {
 }
 
 /**
+ * Login schema model.
+ */
+ export declare interface LocalMfaLogin {
+  email: string;
+  mfa: string;
+}
+
+/**
  * Login with MFA schema model.
  */
 export declare interface LoginMfa {
