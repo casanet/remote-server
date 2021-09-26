@@ -21,9 +21,9 @@ import {
 import { Configuration } from '../config';
 import { getServer, getServersByForwardUser } from '../data-access';
 import { ChannelsSingleton } from '../logic';
-import { ForwardSession, LocalServerInfo, LoginLocalServer } from '../models';
+import { ForwardSession, LocalServerInfo, LoginLocalServer, MfaLoginLocalServer } from '../models';
 import { HttpResponse } from '../models/remote2localProtocol';
-import { ErrorResponse, Login, User } from '../models/sharedInterfaces';
+import { ErrorResponse, LocalMfaLogin, Login, User } from '../models/sharedInterfaces';
 import { forwardCache, jwtSecret, SessionPayload, SystemAuthScopes, USER_AUTHENTICATION_HEADER, USER_SESSION_COOKIE_NAME } from '../security/authentication';
 import { LoginLocalServerSchema, LoginTfaLocalServerSchema, RequestSchemaValidator, SchemaValidator } from '../security/schemaValidator';
 
@@ -145,11 +145,11 @@ export class ForwardAuthController extends Controller {
   @Response<ErrorResponse>(403, 'Auth fail')
   @Response<ErrorResponse>(422, 'Invalid schema')
   @Post('login/tfa')
-  public async loginTfa(@Request() request: express.Request, @Body() login: LoginLocalServer): Promise<void> {
+  public async loginTfa(@Request() request: express.Request, @Body() login: MfaLoginLocalServer): Promise<void> {
     /** See comments in login function, its almost same. */
 
     try {
-      login = await SchemaValidator(login, LoginTfaLocalServerSchema);
+      login = await SchemaValidator(login, LoginTfaLocalServerSchema) as MfaLoginLocalServer;
     } catch (err) {
       this.setStatus(422);
       return err.error.message;
@@ -180,7 +180,7 @@ export class ForwardAuthController extends Controller {
       requestId: undefined,
       httpPath: request.path,
       httpMethod: request.method.toUpperCase(),
-      httpBody: { email: login.email, password: login.password } as Login,
+      httpBody: { email: login.email, mfa: login.mfa } as LocalMfaLogin,
       httpSession: '',
     });
 
