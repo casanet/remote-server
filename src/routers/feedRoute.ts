@@ -10,7 +10,14 @@ export class FeedRouter {
   private feedController: FeedController = new FeedController();
 
   public routes(app: express.Express): void {
-    app.get('/API/feed/minions', async (request: express.Request, response: express.Response) => {
+    app.get('/API/feed/*', async (request: express.Request, response: express.Response, next: NextFunction) => {
+    	// WA to fix deprecated flush, see https://github.com/dpskvn/express-sse/issues/28
+			const originalRespond = response as any;
+			originalRespond.flush = originalRespond.flush || (() => { /* Do nothing */ });
+			next();
+		});
+		
+		app.get('/API/feed/minions', async (request: express.Request, response: express.Response) => {
       try {
 				/** 
 				 * Allow send the authentication key via query in SSE (only)
