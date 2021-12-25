@@ -112,6 +112,8 @@ const models: TsoaRoute.Models = {
         "properties": {
             "event": { "dataType": "enum", "enums": ["created", "update", "removed"], "required": true },
             "minion": { "ref": "Minion", "required": true },
+            "trigger": { "dataType": "enum", "enums": ["user", "timeout", "timing", "lock", "sync", "rotation", "external"] },
+            "user": { "dataType": "any" },
         },
     },
     "ErrorResponse": {
