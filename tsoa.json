@@ -2,7 +2,7 @@
     "swagger": {
         "outputDirectory": "./",
         "entryFile": "./src/index.ts",
-        "host": "localhost:3001",
+        "host": "/",
         "basePath": "/API",
         "tags": [
             {
@@ -34,7 +34,7 @@
                 "description": "Static files/assets for client side"
             }
         ],
-        "name": "CASAnet - remote server API",
+        "name": "Casanet - remote server API",
         "description": "Remote server for forwarding requests to locals home network. hosted in [GitHub repo](https://github.com/casanet/remote-server).",
         "securityDefinitions": {
             "adminAuth": {
@@ -57,7 +57,7 @@
             "http",
             "https"
         ],
-        "yaml" : true
+        "yaml" : false
     },
     "routes": {
         "basePath": "/API",
