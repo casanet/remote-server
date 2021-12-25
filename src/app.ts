@@ -1,20 +1,20 @@
+import axios from 'axios';
 import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 import * as cors from 'cors';
 import * as express from 'express';
 import * as forceSsl from 'express-force-ssl';
 import * as rateLimit from 'express-rate-limit';
+import * as fse from 'fs-extra';
 import { sanitizeExpressMiddleware } from 'generic-json-sanitizer';
 import * as helmet from 'helmet';
+import * as swaggerUi from 'swagger-ui-express';
 import { Configuration } from './config';
 import { logger } from './logger';
 import { FeedRouter } from './routers/feedRoute';
 import { ForwardingIftttRouter } from './routers/forwardingsIftttRoute';
 import { ForwardingRouter } from './routers/forwardingsRoute';
 import { RegisterRoutes } from './routers/routes';
-import * as swaggerUi from 'swagger-ui-express';
-import axios from 'axios';
-import * as fse from 'fs-extra';
 
 // controllers need to be referenced in order to get crawled by the TSOA generator
 import './controllers/administration-admins-controller';
@@ -203,8 +203,10 @@ class App {
 	private serverDocs(): void {
 		this.express.get("/docs/local/swagger.json", async (req, res, next) => {
 			try {
+				// Fetch local Casanet spec 
 				const resSpec = await axios.get('https://raw.githubusercontent.com/casanet/casanet-server/master/backend/src/swagger.json');
 				const spec = resSpec.data;
+				// Set the host to be self
 				spec.host = req.hostname;
 				res.json(spec);
 			} catch (error) {
@@ -215,8 +217,10 @@ class App {
 		});
 		this.express.get("/docs/remote/swagger.json", async (req, res, next) => {
 			try {
+				// Load remote Casanet spec 
 				const resSpec = await fse.promises.readFile('./swagger.json');
 				const spec = JSON.parse(resSpec.toString('utf-8')) as any;
+				// Set the host to be self
 				spec.host = req.hostname;
 				res.json(spec);
 			} catch (error) {
@@ -229,10 +233,12 @@ class App {
 			swaggerOptions: {
 				urls: [
 					{
+						// Send the local swagger serve route for the local
 						url: '/docs/local/swagger.json',
 						name: 'Casanet Local Server',
 					},
 					{
+						// Send the remote swagger serve route for the local
 						url: '/docs/remote/swagger.json',
 						name: 'Casanet Remote Server',
 					}
