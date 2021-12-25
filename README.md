@@ -113,4 +113,4 @@ Define local variable named `DATABASE_URL` of the form `postgres://user:pass@loc
 
 The [remote dashboard](https://github.com/casanet/remote-dashboard) wrapping the administration API.
 
-The full specs of API are documented in [swagger API file](./swagger.yaml).
+The full specs of API are documented in [swagger API file](./swagger.json).

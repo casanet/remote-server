@@ -470,11 +470,28 @@ export declare interface MinionStatus {
 export declare type FeedEvent = 'created' | 'update' | 'removed';
 
 /**
+ * The minion status change trigger
+ */
+ export declare type MinionChangeTrigger =
+ 'user' |
+ 'timeout' |
+ 'timing' |
+ 'lock' |
+ 'sync' |
+ 'rotation' |
+ 'external';
+
+/**
  * Minion feed object.
  */
 export declare interface MinionFeed {
   event: FeedEvent;
   minion: Minion;
+	trigger?: MinionChangeTrigger;
+	user?: {
+		name: string;
+		email: string;
+	};
 }
 
 /**
@@ -696,6 +713,11 @@ export declare interface MinionTimeline {
   minionId: string;
   timestamp: number;
   status: MinionStatus;
+	trigger: MinionChangeTrigger;
+	user?: {
+		name: string;
+		email: string;
+	};
 }
 
 /** Device in commands repo project. see https://github.com/haimkastner/rf-commands-repo. API section */
