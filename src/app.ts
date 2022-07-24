@@ -10,11 +10,11 @@ import { sanitizeExpressMiddleware } from 'generic-json-sanitizer';
 import * as helmet from 'helmet';
 import * as swaggerUi from 'swagger-ui-express';
 import { Configuration } from './config';
+import { RegisterRoutes } from './generated/routes';
 import { logger } from './logger';
 import { FeedRouter } from './routers/feedRoute';
 import { ForwardingIftttRouter } from './routers/forwardingsIftttRoute';
 import { ForwardingRouter } from './routers/forwardingsRoute';
-import { RegisterRoutes } from './generated/routes';
 
 // controllers need to be referenced in order to get crawled by the TSOA generator
 import './controllers/administration-admins-controller';
