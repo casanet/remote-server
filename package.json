@@ -16,7 +16,7 @@
     "migrate": "npm run typeorm -- migration:run",
     "migrate:revert": "npm run typeorm -- migration:revert",
     "start": "npm run build:dev && node ./dist/index.js",
-    "build": "npm run format && npm run lint && tsoa routes && tsoa swagger && tsc",
+    "build": "npm run format && npm run lint && tsoa swagger && tsoa routes  && tsc",
     "build:dev": "tsoa routes && tsoa swagger && tsc"
   },
   "license": "GNU",

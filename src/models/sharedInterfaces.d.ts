@@ -62,7 +62,7 @@ export declare interface Login {
 /**
  * Login schema model.
  */
- export declare interface LocalMfaLogin {
+export declare interface LocalMfaLogin {
   email: string;
   mfa: string;
 }
@@ -472,14 +472,7 @@ export declare type FeedEvent = 'created' | 'update' | 'removed';
 /**
  * The minion status change trigger
  */
- export declare type MinionChangeTrigger =
- 'user' |
- 'timeout' |
- 'timing' |
- 'lock' |
- 'sync' |
- 'rotation' |
- 'external';
+export declare type MinionChangeTrigger = 'user' | 'timeout' | 'timing' | 'lock' | 'sync' | 'rotation' | 'external';
 
 /**
  * Minion feed object.
@@ -487,11 +480,11 @@ export declare type FeedEvent = 'created' | 'update' | 'removed';
 export declare interface MinionFeed {
   event: FeedEvent;
   minion: Minion;
-	trigger?: MinionChangeTrigger;
-	user?: {
-		name: string;
-		email: string;
-	};
+  trigger?: MinionChangeTrigger;
+  user?: {
+    name: string;
+    email: string;
+  };
 }
 
 /**
@@ -713,11 +706,11 @@ export declare interface MinionTimeline {
   minionId: string;
   timestamp: number;
   status: MinionStatus;
-	trigger: MinionChangeTrigger;
-	user?: {
-		name: string;
-		email: string;
-	};
+  trigger: MinionChangeTrigger;
+  user?: {
+    name: string;
+    email: string;
+  };
 }
 
 /** Device in commands repo project. see https://github.com/haimkastner/rf-commands-repo. API section */

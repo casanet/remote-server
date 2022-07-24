@@ -83,15 +83,17 @@ export const expressAuthentication = async (
     } as ErrorResponse;
   }
 
-	// If the authentication header sent, use it as the token.
-	// Note, that as default in production the token saved only in a secure cookie to avoid XSS.
-	// But we still support using API with authentication header
-	if (request.headers[USER_AUTHENTICATION_HEADER]) {
-		request.cookies[USER_SESSION_COOKIE_NAME] = request.headers[USER_AUTHENTICATION_HEADER] as string;
-	}
+  // If the authentication header sent, use it as the token.
+  // Note, that as default in production the token saved only in a secure cookie to avoid XSS.
+  // But we still support using API with authentication header
+  if (request.headers[USER_AUTHENTICATION_HEADER]) {
+    request.cookies[USER_SESSION_COOKIE_NAME] = request.headers[USER_AUTHENTICATION_HEADER] as string;
+  }
 
   const jwtSession =
-    scopes.indexOf(SystemAuthScopes.adminScope) !== -1 ? request.cookies[ADMIN_SESSION_COOKIE_NAME] : request.cookies[USER_SESSION_COOKIE_NAME];
+    scopes.indexOf(SystemAuthScopes.adminScope) !== -1
+      ? request.cookies[ADMIN_SESSION_COOKIE_NAME]
+      : request.cookies[USER_SESSION_COOKIE_NAME];
   /**
    * If the session cookie empty,
    * there is nothing to check.
