@@ -1,6 +1,6 @@
 {
     "swagger": {
-        "outputDirectory": "./",
+        "outputDirectory": "./src/generated",
         "entryFile": "./src/index.ts",
         "host": "/",
         "basePath": "/API",
@@ -62,7 +62,7 @@
     "routes": {
         "basePath": "/API",
         "entryFile": "./src/index.ts",
-        "routesDir": "./src/routers",
+        "routesDir": "./src/generated",
         "middlewareTemplate": "./src/routers/expressRoutesTemplate.ts.tsoa",
         "authenticationModule": "./src/security/authentication.ts"
     }

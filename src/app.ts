@@ -14,7 +14,7 @@ import { logger } from './logger';
 import { FeedRouter } from './routers/feedRoute';
 import { ForwardingIftttRouter } from './routers/forwardingsIftttRoute';
 import { ForwardingRouter } from './routers/forwardingsRoute';
-import { RegisterRoutes } from './routers/routes';
+import { RegisterRoutes } from './generated/routes';
 
 // controllers need to be referenced in order to get crawled by the TSOA generator
 import './controllers/administration-admins-controller';
@@ -204,10 +204,26 @@ class App {
 		this.express.get("/docs/local/swagger.json", async (req, res, next) => {
 			try {
 				// Fetch local Casanet spec 
-				const resSpec = await axios.get('https://raw.githubusercontent.com/casanet/casanet-server/master/backend/src/swagger.json');
-				const spec = resSpec.data;
+				const allSpecsRes = await axios.get(`https://api.swaggerhub.com/apis/haimkastner/casanet-local-server`);
+
+				const allSpecs = allSpecsRes.data;
+				// Get the latest API available
+				const latestVersionInfo = allSpecs.apis[allSpecs.apis.length - 1];
+
+				// Find the SWagger property, where there is the URL to the spec 
+				const latestVersionUrl = latestVersionInfo.properties.find(prop => prop.type === 'Swagger')?.url;
+
+				const latestSpecRes = await axios.get(latestVersionUrl);
+
+				
+				const spec = latestSpecRes.data;
+
 				// Set the host to be self
-				spec.host = req.hostname;
+				spec.servers = [
+					{
+						"url": `${req.hostname}:${req.socket.localPort}`,
+					}
+				];
 				res.json(spec);
 			} catch (error) {
 				logger.error(`Unable to fetch latest local Casanet spec ${error.message}`);
@@ -218,10 +234,10 @@ class App {
 		this.express.get("/docs/remote/swagger.json", async (req, res, next) => {
 			try {
 				// Load remote Casanet spec 
-				const resSpec = await fse.promises.readFile('./swagger.json');
+				const resSpec = await fse.promises.readFile('./src/generated/swagger.json');
 				const spec = JSON.parse(resSpec.toString('utf-8')) as any;
 				// Set the host to be self
-				spec.host = req.hostname;
+				spec.host = `${req.hostname}:${req.socket.localPort}`;
 				res.json(spec);
 			} catch (error) {
 				logger.error(`Unable to load remote Casanet spec, ${error.message}`);
