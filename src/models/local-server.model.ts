@@ -29,6 +29,10 @@ export class LocalServer {
   @Column({ name: 'valid_users', type: 'varchar', array: true, nullable: false })
   public validUsers: string[];
 
+  /** Free text comment */
+  @Column({ name: 'comment', type: 'varchar', length: 1000, nullable: true })
+  public comment?: string;
+
   constructor(private localServer?: Partial<LocalServer>) {
     if (localServer) {
       Object.assign(this, localServer);

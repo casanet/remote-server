@@ -34,7 +34,7 @@ Simple diagram:
 
 1. Download the project via git or download files as a zip.
 1. Install Node.js on the machine.
-1. Navigate in a command line to `$/remote-server` and press `npm ci`.
+1. Navigate in a command line to `$/remote-server` and press `yarn install --frozen-lockfile`.
 1. Build the source code by `npm run build`.
 1. Press `npm run start` to run the server.
 
@@ -113,4 +113,4 @@ Define local variable named `DATABASE_URL` of the form `postgres://user:pass@loc
 
 The [remote dashboard](https://github.com/casanet/remote-dashboard) wrapping the administration API.
 
-The full specs of API are documented in [swagger API file](./swagger.json).
+The full specs of API are served on running service using SwaggerUI on `http://<ip/domain>/docs`.

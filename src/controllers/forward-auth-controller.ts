@@ -24,8 +24,20 @@ import { ChannelsSingleton } from '../logic';
 import { ForwardSession, LocalServerInfo, LoginLocalServer, MfaLoginLocalServer } from '../models';
 import { HttpResponse } from '../models/remote2localProtocol';
 import { ErrorResponse, LocalMfaLogin, Login, User } from '../models/sharedInterfaces';
-import { forwardCache, jwtSecret, SessionPayload, SystemAuthScopes, USER_AUTHENTICATION_HEADER, USER_SESSION_COOKIE_NAME } from '../security/authentication';
-import { LoginLocalServerSchema, LoginTfaLocalServerSchema, RequestSchemaValidator, SchemaValidator } from '../security/schemaValidator';
+import {
+  forwardCache,
+  jwtSecret,
+  SessionPayload,
+  SystemAuthScopes,
+  USER_AUTHENTICATION_HEADER,
+  USER_SESSION_COOKIE_NAME,
+} from '../security/authentication';
+import {
+  LoginLocalServerSchema,
+  LoginTfaLocalServerSchema,
+  RequestSchemaValidator,
+  SchemaValidator,
+} from '../security/schemaValidator';
 
 /**
  * Manage local servers login requests forwarding
@@ -149,7 +161,7 @@ export class ForwardAuthController extends Controller {
     /** See comments in login function, its almost same. */
 
     try {
-      login = await SchemaValidator(login, LoginTfaLocalServerSchema) as MfaLoginLocalServer;
+      login = (await SchemaValidator(login, LoginTfaLocalServerSchema)) as MfaLoginLocalServer;
     } catch (err) {
       this.setStatus(422);
       return err.error.message;
@@ -236,20 +248,20 @@ export class ForwardAuthController extends Controller {
     sessionPayload.scope = SystemAuthScopes.forwardScope;
     const token = jwt.sign(sessionPayload, jwtSecret, { expiresIn: ms(httpResponse.httpSession.maxAge * 1000) });
 
-		/** Copy the local-server headers */
-		this.setHeader(USER_AUTHENTICATION_HEADER, token);
-		this.setHeader('Access-Control-Allow-Headers', 'Authorization');
-		this.setHeader('Access-Control-Expose-Headers', 'Authentication');
-	
+    /** Copy the local-server headers */
+    this.setHeader(USER_AUTHENTICATION_HEADER, token);
+    this.setHeader('Access-Control-Allow-Headers', 'Authorization');
+    this.setHeader('Access-Control-Expose-Headers', 'Authentication');
+
     const maxAgeInSec = httpResponse.httpSession.maxAge;
     const isHttpsOnly = Configuration.http.useHttps || process.env.APP_BEHIND_PROXY_REDIRECT_HTTPS;
     const forceSameDomain = process.env.SAME_SITE_POLICY !== 'false';
     // tslint:disable-next-line:max-line-length
     this.setHeader(
       'Set-Cookie',
-      `${USER_SESSION_COOKIE_NAME}=${token}; Max-Age=${maxAgeInSec}; Path=/; HttpOnly; ${isHttpsOnly ? 'Secure' : ''}; SameSite=${
-        forceSameDomain ? 'Strict' : 'None'
-      };`,
+      `${USER_SESSION_COOKIE_NAME}=${token}; Max-Age=${maxAgeInSec}; Path=/; HttpOnly; ${
+        isHttpsOnly ? 'Secure' : ''
+      }; SameSite=${forceSameDomain ? 'Strict' : 'None'};`,
     );
     // TODO change to 204, after frontend update
     this.setStatus(200);

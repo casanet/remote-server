@@ -177,9 +177,9 @@ export class AdministrationAuthController extends Controller {
     // tslint:disable-next-line:max-line-length
     this.setHeader(
       'Set-Cookie',
-      `${ADMIN_SESSION_COOKIE_NAME}=${token}; Max-Age=${maxAgeInSec}; Path=/; HttpOnly; ${isHttpsOnly ? 'Secure' : ''}; SameSite=${
-        forceSameDomain ? 'Strict' : Configuration.runningMode === 'debug' ? 'Lax' : 'None'
-      };`,
+      `${ADMIN_SESSION_COOKIE_NAME}=${token}; Max-Age=${maxAgeInSec}; Path=/; HttpOnly; ${
+        isHttpsOnly ? 'Secure' : ''
+      }; SameSite=${forceSameDomain ? 'Strict' : Configuration.runningMode === 'debug' ? 'Lax' : 'None'};`,
     );
   }
 }
