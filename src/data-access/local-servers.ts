@@ -43,6 +43,20 @@ export const updateServerMeta = async (macAddress: string, platform: string, ver
   });
 };
 
+export const updateServerConnection = async (macAddress: string): Promise<void> => {
+  const serversRepository = getConnection().getRepository(LocalServer);
+  await serversRepository.update(macAddress, {
+    lastConnection: new Date().getTime()
+  });
+};
+
+export const updateServerDisconnection = async (macAddress: string): Promise<void> => {
+  const serversRepository = getConnection().getRepository(LocalServer);
+  await serversRepository.update(macAddress, {
+    lastDisconnection: new Date().getTime()
+  });
+};
+
 export const createServer = async (server: LocalServer): Promise<void> => {
   const serversRepository = getConnection().getRepository(LocalServer);
   await serversRepository.insert(new LocalServer(server));

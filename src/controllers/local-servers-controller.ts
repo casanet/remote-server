@@ -46,10 +46,7 @@ export class LocalServersController extends Controller {
     const servers = (await getServers()) as LocalServerStatus[];
     /** Add server status to each server */
     for (const server of servers) {
-      const { lastConnection, lastDisconnection } = await ChannelsSingleton.connectionTimeStatus(server.macAddress);
       server.connectionStatus = await ChannelsSingleton.connectionStatus(server.macAddress);
-      server.lastConnection = lastConnection;
-      server.lastDisconnection = lastDisconnection;
     }
     return servers;
   }

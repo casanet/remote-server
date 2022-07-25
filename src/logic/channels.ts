@@ -3,9 +3,10 @@ import * as momoent from 'moment';
 import * as moment from 'moment';
 import * as randomstring from 'randomstring';
 import { BehaviorSubject, Observable, Subscriber } from 'rxjs';
+import { inspect } from 'util';
 import * as ws from 'ws';
 import { Configuration } from '../config';
-import { checkSession, getServer, updateServer, updateServerMeta, verifyAndGetLocalServer } from '../data-access';
+import { checkSession, getServer, updateServer, updateServerConnection, updateServerDisconnection, updateServerMeta, verifyAndGetLocalServer } from '../data-access';
 import { logger } from '../logger';
 import { SendMail } from '../mailSender';
 import {
@@ -53,9 +54,6 @@ export class Channels {
   /** Map all local servers ws channel by local server mac address */
   private localChannelsMap: { [key: string]: CasaWs } = {};
 
-  /** Hold the connection/ disconnection timestamp of each local server */
-  private channelsDisconnectionMap: { [key: string]: number } = {};
-  private channelsConnectionMap: { [key: string]: number } = {};
 
   /**
    * Hold each request promise reject/resolve methods.
@@ -253,7 +251,10 @@ export class Channels {
 
     /** Remove it from channel map. */
     delete this.localChannelsMap[wsChannel.machineMac];
-    this.channelsDisconnectionMap[wsChannel.machineMac] = new Date().getTime();
+
+    updateServerDisconnection(wsChannel.machineMac).catch((err) => {
+      logger.info(`Failed to update ${wsChannel.machineMac} disconnection ${inspect(err, false, 3)}`);
+    });
 
     logger.info(`Local server ${wsChannel.machineMac} ws channel closed`);
 
@@ -279,7 +280,9 @@ export class Channels {
 
     /** Remove it from channel map. */
     delete this.localChannelsMap[macAddress];
-    this.channelsDisconnectionMap[macAddress] = new Date().getTime();
+    updateServerDisconnection(macAddress).catch((err) => {
+      logger.info(`Failed to update ${macAddress} disconnection ${inspect(err, false, 3)}`);
+    });
     logger.info(`Local server ${localServerConnection.machineMac} disconnected by the remote server`);
   }
 
@@ -289,22 +292,6 @@ export class Channels {
    */
   public async connectionStatus(macAddress: string): Promise<boolean> {
     return macAddress in this.localChannelsMap;
-  }
-
-  /**
-   * Get channel connection time stamps.
-   * @param macAddress local server physical address
-   */
-  public async connectionTimeStatus(
-    macAddress: string,
-  ): Promise<{
-    lastConnection: number;
-    lastDisconnection: number;
-  }> {
-    return {
-      lastConnection: this.channelsConnectionMap[macAddress] || 0,
-      lastDisconnection: this.channelsDisconnectionMap[macAddress] || 0,
-    };
   }
 
   /**
@@ -372,7 +359,9 @@ export class Channels {
 
       /** Hold the channel after auth success. */
       this.localChannelsMap[certAuth.macAddress] = wsChannel;
-      this.channelsConnectionMap[certAuth.macAddress] = new Date().getTime();
+      updateServerConnection(certAuth.macAddress).catch((err) => {
+        logger.info(`Failed to update ${certAuth.macAddress} connection ${inspect(err, false, 3)}`);
+      });
 
       /** Send local server authenticatedSuccessfully message. */
       this.sendMessage(wsChannel, { remoteMessagesType: 'authenticatedSuccessfully', message: {} });
@@ -387,15 +376,17 @@ export class Channels {
       /** Update subscribers with the new local server status */
       this.localServersStatusFeed.next({ localServerId: certAuth.macAddress, theNewStatus: true });
     } catch (error) {
-      logger.debug(`Fail to authenticate local server '${certAuth.macAddress}' connection request`);
+      logger.debug(`Fail to authenticate local server '${certAuth.macAddress}' connection request, ${inspect(error, false, 3)}`);
+
+      const internalError = error?.name === 'ConnectionNotFoundError';
 
       /** send generic auth fail message */
       this.sendMessage(wsChannel, {
         remoteMessagesType: 'authenticationFail',
         message: {
           authenticationFail: {
-            responseCode: 3403,
-            message: 'authorization of local server in remote, fail',
+            responseCode: internalError ? 13501 : 3403,
+            message: internalError ? 'Remote Server Internal Error' : 'authorization of local server in remote, fail',
           },
         },
       });

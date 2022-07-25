@@ -182,7 +182,7 @@ class App {
    * Parse request query and body.
    */
   private dataParsing(): void {
-    this.express.use(cookieParser()); // Parse every request cookie to readble json.
+    this.express.use(cookieParser()); // Parse every request cookie to readable json.
 
     this.express.use(bodyParser.json({ limit: '2mb' })); // for parsing application/json
   }
@@ -220,7 +220,7 @@ class App {
         // Set the host to be self
         spec.servers = [
           {
-            url: `${req.hostname}:${req.socket.localPort}`,
+            url: req.headers.host || req.hostname
           },
         ];
         res.json(spec);
@@ -235,7 +235,7 @@ class App {
         const resSpec = await fse.promises.readFile('./src/generated/swagger.json');
         const spec = JSON.parse(resSpec.toString('utf-8')) as any;
         // Set the host to be self
-        spec.host = `${req.hostname}:${req.socket.localPort}`;
+        spec.host = req.headers.host || req.hostname;
         res.json(spec);
       } catch (error) {
         logger.error(`Unable to load remote Casanet spec, ${error.message}`);

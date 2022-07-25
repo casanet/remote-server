@@ -1,4 +1,9 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, ValueTransformer } from 'typeorm';
+
+export const bigint: ValueTransformer = {
+  to: (entityValue: number) => entityValue.toString(),
+  from: (databaseValue: string): number => parseInt(databaseValue, 10)
+};
 
 /**
  * Represents a local server in the system.
@@ -32,6 +37,14 @@ export class LocalServer {
   /** Free text comment */
   @Column({ name: 'comment', type: 'varchar', length: 1000, nullable: true })
   public comment?: string;
+
+  /** Server last connection timestamp */
+  @Column({ name: 'last_connection', type: 'bigint', nullable: true, transformer: [bigint] })
+  public lastConnection?: number;
+
+  /** Server last disconnection timestamp */
+  @Column({ name: 'last_disconnection', type: 'bigint', nullable: true, transformer: [bigint] })
+  public lastDisconnection?: number;
 
   constructor(private localServer?: Partial<LocalServer>) {
     if (localServer) {
