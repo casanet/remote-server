@@ -54,6 +54,8 @@ export const serverSchema: ObjectSchema = Joi.object()
       .required(),
     platform: Joi.allow(''), // Block UI from it
     version: Joi.allow(''), // Block UI from it
+    lastConnection: Joi.allow(''), // Block UI from it
+    lastDisconnection: Joi.allow(''), // Block UI from it
     comment: Joi.string()
       .max(1000)
       .allow(''),
