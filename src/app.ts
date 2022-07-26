@@ -9,6 +9,7 @@ import * as fse from 'fs-extra';
 import { sanitizeExpressMiddleware } from 'generic-json-sanitizer';
 import * as helmet from 'helmet';
 import * as swaggerUi from 'swagger-ui-express';
+import * as url from 'url';
 import { Configuration } from './config';
 import { RegisterRoutes } from './generated/routes';
 import { logger } from './logger';
@@ -217,10 +218,12 @@ class App {
 
         const spec = latestSpecRes.data;
 
+        const originalSpecURL = url.parse(spec.servers?.[0]?.url || '');
+
         // Set the host to be self
         spec.servers = [
           {
-            url: `http${req.secure ? 's' : ''}://${req.headers.host || req.hostname}`
+            url: `http${req.secure ? 's' : ''}://${req.headers.host || req.hostname}${originalSpecURL.pathname || ''}`
           },
         ];
         res.json(spec);

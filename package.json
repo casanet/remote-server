@@ -54,6 +54,7 @@
     "swagger-ui-express": "^4.3.0",
     "tsoa": "2.4.3",
     "typeorm": "^0.2.37",
+    "url": "^0.11.0",
     "ws": "^6.2.2"
   },
   "devDependencies": {
