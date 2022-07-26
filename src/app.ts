@@ -220,7 +220,7 @@ class App {
         // Set the host to be self
         spec.servers = [
           {
-            url: req.headers.host || req.hostname
+            url: `http${req.secure ? 's' : ''}://${req.headers.host || req.hostname}`
           },
         ];
         res.json(spec);
@@ -236,6 +236,7 @@ class App {
         const spec = JSON.parse(resSpec.toString('utf-8')) as any;
         // Set the host to be self
         spec.host = req.headers.host || req.hostname;
+        spec.schemes = [ `http${req.secure ? 's' : ''}` ];
         res.json(spec);
       } catch (error) {
         logger.error(`Unable to load remote Casanet spec, ${error.message}`);
