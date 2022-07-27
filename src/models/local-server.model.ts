@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn, ValueTransformer } from 'typeorm';
 
 export const bigint: ValueTransformer = {
-  to: (entityValue: number) => entityValue.toString(),
+  to: (entityValue: number) => entityValue?.toString(),
   from: (databaseValue: string): number => parseInt(databaseValue, 10)
 };
 

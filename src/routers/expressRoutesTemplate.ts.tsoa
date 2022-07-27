@@ -15,6 +15,7 @@ import { {{name}} } from '{{modulePath}}';
 import { expressAuthentication } from '{{authenticationModule}}';
 {{/if}}
 import * as express from 'express';
+import { inspect } from 'util';
 import { ErrorResponse, User } from '../models/sharedInterfaces';
 const models: TsoaRoute.Models = {
     {{#each models}}
@@ -132,6 +133,7 @@ export function RegisterRoutes(app: express.Express) {
                 }
             })
             .catch(async (error: any) => {
+                console.error(`Request fail, error: ${inspect(error, false, 3)}`);
                 /**
                  * If error is from TSOA sent it back to client (it's part of API)
                  * Else throw it back.
