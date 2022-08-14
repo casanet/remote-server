@@ -35,11 +35,12 @@ export const updateServer = async (server: LocalServer): Promise<void> => {
   });
 };
 
-export const updateServerMeta = async (macAddress: string, platform: string, version: string): Promise<void> => {
+export const updateServerMeta = async (macAddress: string, platform: string, version: string, localIp?: string): Promise<void> => {
   const serversRepository = getConnection().getRepository(LocalServer);
   await serversRepository.update(macAddress, {
     platform,
     version,
+    localIp,
   });
 };
 

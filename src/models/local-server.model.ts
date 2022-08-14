@@ -46,6 +46,11 @@ export class LocalServer {
   @Column({ name: 'last_disconnection', type: 'bigint', nullable: true, transformer: [bigint] })
   public lastDisconnection?: number;
 
+  
+  /** Server last disconnection timestamp */
+  @Column({ name: 'local_ip', type: 'varchar', length: 256, nullable: true })
+  public localIp?: string;
+
   constructor(private localServer?: Partial<LocalServer>) {
     if (localServer) {
       Object.assign(this, localServer);
