@@ -276,7 +276,7 @@ export class Channels {
 
     try {
       localServerConnection.close();
-    } catch (error) {}
+    } catch (error) { }
 
     /** Remove it from channel map. */
     delete this.localChannelsMap[macAddress];
@@ -346,7 +346,7 @@ export class Channels {
         /** Need to test the behavior of local server when closing old connection manually  */
         try {
           this.localChannelsMap[certAuth.macAddress].close();
-        } catch (err) {}
+        } catch (err) { }
 
         delete this.localChannelsMap[certAuth.macAddress];
       }
@@ -368,9 +368,12 @@ export class Channels {
 
       logger.info(`Local server ${localServer.displayName} connected successfully`);
 
-      // if the version or platform was changed, update the server meta
-      if (localServer.platform !== certAuth.platform || localServer.version !== certAuth.version) {
-        await updateServerMeta(certAuth.macAddress, certAuth.platform, certAuth.version);
+      // if the version, platform or local IP was changed, update the server meta
+      if (localServer.platform !== certAuth.platform
+        || localServer.version !== certAuth.version
+        || localServer.localIp !== certAuth.localIp
+      ) {
+        await updateServerMeta(certAuth.macAddress, certAuth.platform, certAuth.version, certAuth.localIp);
       }
 
       /** Update subscribers with the new local server status */
@@ -395,7 +398,7 @@ export class Channels {
       setTimeout(() => {
         try {
           this.localChannelsMap[certAuth.macAddress].close();
-        } catch (error) {}
+        } catch (error) { }
       }, 4000);
     }
   }
@@ -606,7 +609,7 @@ export class Channels {
   private sendMessage(wsChannel: ws, remoteMessage: RemoteMessage) {
     try {
       wsChannel.send(JSON.stringify(remoteMessage));
-    } catch (error) {}
+    } catch (error) { }
   }
 }
 

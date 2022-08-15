@@ -54,6 +54,7 @@ export const serverSchema: ObjectSchema = Joi.object()
       .required(),
     platform: Joi.allow(''), // Block UI from it
     version: Joi.allow(''), // Block UI from it
+    localIp: Joi.allow(''), // Block UI from it
     lastConnection: Joi.allow(''), // Block UI from it
     lastDisconnection: Joi.allow(''), // Block UI from it
     comment: Joi.string()
@@ -167,6 +168,8 @@ const initSchema = Joi.object().keys({
   version: Joi.string()
     .not('')
     .required(),
+  localIp: Joi.string()
+    .ip(),
 });
 
 const httpResponseSchema = Joi.object().keys({
