@@ -9,6 +9,7 @@ import { Configuration } from '../config';
 import { checkSession, getServer, updateServer, updateServerConnection, updateServerDisconnection, updateServerMeta, verifyAndGetLocalServer } from '../data-access';
 import { logger } from '../logger';
 import { SendMail } from '../mailSender';
+import { LocalServer } from '../models/local-server.model';
 import {
   HttpRequest,
   HttpResponse,
@@ -335,8 +336,24 @@ export class Channels {
    */
   private async handleInitializationRequest(wsChannel: CasaWs, certAuth: InitializationRequest) {
     try {
-      /** Get the local server based on cert mac address. */
-      const localServer = await verifyAndGetLocalServer({ mac: certAuth.macAddress, key: certAuth.remoteAuthKey });
+      let localServer: LocalServer;
+      try {
+        /** Get the local server based on cert mac address. */
+        localServer = await verifyAndGetLocalServer({ mac: certAuth.macAddress, key: certAuth.remoteAuthKey });
+      } catch (error) {
+        logger.error(`[handleInitializationRequest] Fail to authenticate local server '${certAuth.macAddress}' connection request, ${inspect(error, false, 3)}`);
+        this.sendMessage(wsChannel, {
+          remoteMessagesType: 'authenticationFail',
+          message: {
+            authenticationFail: {
+              responseCode: 3403,
+              message: 'authorization of local server in remote, fail',
+            },
+          },
+        });
+        throw new Error('authenticationFail');
+      }
+
 
       /** If there is other channel from same local server */
       if (this.localChannelsMap[certAuth.macAddress]) {
@@ -379,20 +396,21 @@ export class Channels {
       /** Update subscribers with the new local server status */
       this.localServersStatusFeed.next({ localServerId: certAuth.macAddress, theNewStatus: true });
     } catch (error) {
-      logger.debug(`Fail to authenticate local server '${certAuth.macAddress}' connection request, ${inspect(error, false, 3)}`);
+      logger.error(`Fail to authenticate local server '${certAuth.macAddress}' connection request, ${inspect(error, false, 3)}`);
 
-      const internalError = error?.name === 'ConnectionNotFoundError';
+      if (error.message !== 'authenticationFail') {
 
-      /** send generic auth fail message */
-      this.sendMessage(wsChannel, {
-        remoteMessagesType: 'authenticationFail',
-        message: {
-          authenticationFail: {
-            responseCode: internalError ? 13501 : 3403,
-            message: internalError ? 'Remote Server Internal Error' : 'authorization of local server in remote, fail',
+        /** send generic auth fail message */
+        this.sendMessage(wsChannel, {
+          remoteMessagesType: 'authenticationFail',
+          message: {
+            authenticationFail: {
+              responseCode: 13501,
+              message: 'Remote Server Internal Error',
+            },
           },
-        },
-      });
+        });
+      }
 
       /** wait a while until closing, to allow local server process fail message */
       setTimeout(() => {

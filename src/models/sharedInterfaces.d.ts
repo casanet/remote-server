@@ -76,6 +76,11 @@ export declare interface LoginMfa {
   mfaCode: string;
 }
 
+export declare interface LoginResponse {
+	isRemote?: boolean;
+	localAddress?: string;
+}
+
 /**
  * Represents any physical device in a local network.
  */

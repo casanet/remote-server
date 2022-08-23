@@ -20,10 +20,11 @@ import {
 } from 'tsoa';
 import { Configuration } from '../config';
 import { getServer, getServersByForwardUser } from '../data-access';
+import { logger } from '../logger';
 import { ChannelsSingleton } from '../logic';
 import { ForwardSession, LocalServerInfo, LoginLocalServer, MfaLoginLocalServer } from '../models';
 import { HttpResponse } from '../models/remote2localProtocol';
-import { ErrorResponse, LocalMfaLogin, Login, User } from '../models/sharedInterfaces';
+import { ErrorResponse, LocalMfaLogin, Login, LoginResponse, User } from '../models/sharedInterfaces';
 import {
   forwardCache,
   jwtSecret,
@@ -58,7 +59,7 @@ export class ForwardAuthController extends Controller {
   public async login(
     @Request() request: express.Request,
     @Body() login: LoginLocalServer,
-  ): Promise<void | LocalServerInfo[]> {
+  ): Promise<LoginResponse | LocalServerInfo[]> {
     try {
       login = await SchemaValidator(login, LoginLocalServerSchema);
     } catch (err) {
@@ -142,7 +143,7 @@ export class ForwardAuthController extends Controller {
      */
     if (localResponse.httpStatus === 501 && localResponse.httpBody && localResponse.httpBody.responseCode === 4501) {
       this.setStatus(403);
-      return;
+      return {};
     }
 
     /** Any other case, send local server response as is to client. */
@@ -157,7 +158,7 @@ export class ForwardAuthController extends Controller {
   @Response<ErrorResponse>(403, 'Auth fail')
   @Response<ErrorResponse>(422, 'Invalid schema')
   @Post('login/tfa')
-  public async loginTfa(@Request() request: express.Request, @Body() login: MfaLoginLocalServer): Promise<void> {
+  public async loginTfa(@Request() request: express.Request, @Body() login: MfaLoginLocalServer): Promise<LoginResponse> {
     /** See comments in login function, its almost same. */
 
     try {
@@ -235,7 +236,7 @@ export class ForwardAuthController extends Controller {
     this.setHeader('Set-Cookie', `${USER_SESSION_COOKIE_NAME}=null; Max-Age=${1}; Path=/; HttpOnly; SameSite=Strict`);
   }
 
-  private async activeSession(localServerMacAddress: string, localUser: string, httpResponse: HttpResponse) {
+  private async activeSession(localServerMacAddress: string, localUser: string, httpResponse: HttpResponse): Promise<LoginResponse> {
     /** Never save plain text key. */
     const forwardSession: ForwardSession = {
       session: httpResponse.httpSession.key,
@@ -259,11 +260,16 @@ export class ForwardAuthController extends Controller {
     // tslint:disable-next-line:max-line-length
     this.setHeader(
       'Set-Cookie',
-      `${USER_SESSION_COOKIE_NAME}=${token}; Max-Age=${maxAgeInSec}; Path=/; HttpOnly; ${
-        isHttpsOnly ? 'Secure' : ''
+      `${USER_SESSION_COOKIE_NAME}=${token}; Max-Age=${maxAgeInSec}; Path=/; HttpOnly; ${isHttpsOnly ? 'Secure' : ''
       }; SameSite=${forceSameDomain ? 'Strict' : 'None'};`,
     );
     // TODO change to 204, after frontend update
     this.setStatus(200);
+
+    try {
+      return { ...JSON.parse(httpResponse.httpBody), isRemote: true };
+    } catch (error) {
+      logger.error(`[ForwardAuthController.activeSession] Unable to read httpResponse httpBody ${error.message}`)
+    }
   }
 }
