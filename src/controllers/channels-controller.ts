@@ -35,7 +35,7 @@ export class ChannelsController extends Controller {
         const localMessage: LocalMessage = await SchemaValidator(JSON.parse(msg as string), LocalMessageSchema);
         ChannelsSingleton.onWsMessage(wsChannels as CasaWs, localMessage);
       } catch (error) {
-        logger.warn('ws message parse failed');
+        logger.warn(`ws message parse failed ${error?.message}`);
       }
     });
 

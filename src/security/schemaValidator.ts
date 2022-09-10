@@ -168,8 +168,7 @@ const initSchema = Joi.object().keys({
   version: Joi.string()
     .not('')
     .required(),
-  localIp: Joi.string()
-    .ip(),
+  localIp: Joi.alternatives().try(Joi.string().uri(), Joi.string().ip()),
 });
 
 const httpResponseSchema = Joi.object().keys({

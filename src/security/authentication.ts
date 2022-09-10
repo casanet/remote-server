@@ -1,5 +1,6 @@
 import * as express from 'express';
 import * as jwt from 'jsonwebtoken';
+import { inspect } from 'util';
 import { Configuration } from '../config';
 import { logger } from '../logger';
 import { Cache } from '../logic';
@@ -74,7 +75,7 @@ export const expressAuthentication = async (
   /** Handle Rf commands repo API requests */
   if (scopes.includes(SystemAuthScopes.rfRepositoryAuth)) {
     if (!RF_REPOSITORY_API_KEY) {
-      logger.warn('In order to enable the Rf command repo API please set the "RF_REPOSITORY_API_KEY" env var!');
+      logger.warn('[expressAuthentication] In order to enable the Rf command repo API please set the "RF_REPOSITORY_API_KEY" env var!');
     } else if (RF_REPOSITORY_API_KEY === request.headers['rf-repository-api-key']) {
       return;
     }
@@ -108,9 +109,11 @@ export const expressAuthentication = async (
   const payload = jwt.verify(jwtSession, jwtSecret) as SessionPayload;
 
   /** Check the session scope */
-  if (scopes.indexOf(payload.scope) !== -1) {
+  if (scopes.includes(payload.scope)) {
     return payload.scope === SystemAuthScopes.adminScope ? payload.email : payload;
   }
+
+  logger.warn(`[expressAuthentication] The user ${inspect( payload ,null, 2)} tries to access forbidden scope ${JSON.stringify(scopes)}`);
 
   throw {
     responseCode: 1401,
